@@ -13,7 +13,9 @@ public class MetricSender {
     private static MetricWrapper singleton;
 
     public static void sendMetric(SignalFxProtocolBuffers.DataPoint.Builder builder) {
-        singleton.sendMetric(builder);
+        if (singleton != null) {
+            singleton.sendMetric(builder);
+        }
     }
 
     protected static void setWrapper(MetricWrapper metricWrapper) {

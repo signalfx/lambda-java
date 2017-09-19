@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.signalfx.metrics.protobuf.SignalFxProtocolBuffers;
 
 /**
  * @author park
@@ -21,6 +22,14 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 public class SignalFxRequestWrapper implements RequestHandler<Object, Object> {
 
     private static final String SIGNALFX_LAMBDA_HANDLER = "SIGNALFX_LAMBDA_HANDLER";
+
+    // metric names
+    private static final String METRIC_NAME_PREFIX = "aws.lambda.";
+    private static final String METRIC_NAME_INVOCATION = METRIC_NAME_PREFIX + "invocation";
+    private static final String METRIC_NAME_COLD_START = METRIC_NAME_PREFIX + "coldStart";
+    private static final String METRIC_NAME_ERROR = METRIC_NAME_PREFIX + "error";
+    private static final String METRIC_NAME_EXECUATION_TIME = METRIC_NAME_PREFIX + "executionTime";
+    private static final String METRIC_NAME_COMPLETE = METRIC_NAME_PREFIX + "complete";
 
     // TODO: fix all the exception to a proper one and not throw stacktrace for internal stuff.
 
@@ -61,6 +70,7 @@ public class SignalFxRequestWrapper implements RequestHandler<Object, Object> {
             throw new RuntimeException(handlerClassName + "'s  constructor is not accessible");
         } catch (InvocationTargetException e) {
             // constructor throws exception
+            sendMetric(METRIC_NAME_ERROR, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
             throw new RuntimeException(handlerClassName + " threw exception from constructor");
         }
     }
@@ -102,19 +112,34 @@ public class SignalFxRequestWrapper implements RequestHandler<Object, Object> {
         return firstOptional.get();
     }
 
+    private void sendMetric(String metricName, SignalFxProtocolBuffers.MetricType metricType, long value) {
+        SignalFxProtocolBuffers.DataPoint.Builder builder =
+                SignalFxProtocolBuffers.DataPoint.newBuilder()
+                        .setMetric(metricName)
+                        .setMetricType(metricType)
+                        .setValue(
+                                SignalFxProtocolBuffers.Datum.newBuilder()
+                                        .setIntValue(value));
+        MetricSender.sendMetric(builder);
+    }
+
     @Override
     public Object handleRequest(Object input, Context context) {
         try (MetricWrapper _ = new MetricWrapper(context)) {
+            long startTime = System.nanoTime();
+            sendMetric(METRIC_NAME_INVOCATION, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
             if (targetMethod == null) {
                 instantiateTargetClass();
                 targetMethod = getTargetMethod();
+
+                // assume cold start
+                sendMetric(METRIC_NAME_COLD_START, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
             }
 
             Class<?>[] parameterTypes = targetMethod.getParameterTypes();
             Object[] parameters = new Object[parameterTypes.length];
             for (int i = 0; i < parameterTypes.length; i++) {
                 // loop through to populate each index of parameter
-
                 Object parameter = null;
                 Class clazz = parameterTypes[i];
                 boolean isContext = clazz.equals(Context.class);
@@ -136,12 +161,15 @@ public class SignalFxRequestWrapper implements RequestHandler<Object, Object> {
                 throw new RuntimeException("Method is inaccessible", e);
             } catch (InvocationTargetException e) {
                 // Underlying method throw exception
+                sendMetric(METRIC_NAME_ERROR, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
                 throw new RuntimeException(e.getTargetException());
             } catch (Exception e) {
                 // something else
                 throw new RuntimeException("something went wrong", e);
             }
-
+            sendMetric(METRIC_NAME_COMPLETE, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+            sendMetric(METRIC_NAME_EXECUATION_TIME, SignalFxProtocolBuffers.MetricType.GAUGE,
+                    System.nanoTime() - startTime);
             return returnObj;
         } catch (IOException e) {
             throw new RuntimeException(e);
