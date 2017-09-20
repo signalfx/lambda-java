@@ -24,16 +24,6 @@
       <artifactId>signalfx-java</artifactId>
       <version>0.0.35</version>
     </dependency>
-    <dependency>
-      <groupId>com.cagataygurturk</groupId>
-      <artifactId>aws-lambda-local-runner</artifactId>
-      <version>0.0.1</version>
-      <!--
-      Scope: provided makes this dependency to be excluded from deployment package
-      So it extremely reduces JAR package size
-      -->
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
   <repositories>
     <repository>
@@ -56,9 +46,9 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.2.1</version>
         <configuration>
-          <mainClass>com.cagataygurturk.lambda.LocalRunner</mainClass>
+          <mainClass>com.signalfx.lambda.runner.LambdaRunner</mainClass>
           <arguments>
-            <argument>com.signalfx.lambda.SignalFxRequestWrapper</argument>
+            <argument>com.signalfx.lambda.wrapper.SignalFxRequestWrapper</argument>
           </arguments>
         </configuration>
       </plugin>
@@ -75,6 +65,25 @@
             <goals>
               <goal>shade</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/wrapper/**</include>
+              </includes>
+            </configuration>
           </execution>
         </executions>
       </plugin>

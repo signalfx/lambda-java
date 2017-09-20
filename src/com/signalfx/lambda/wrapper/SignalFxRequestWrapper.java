@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2017 SignalFx, Inc.
  */
-package com.signalfx.lambda;
+package com.signalfx.lambda.wrapper;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;

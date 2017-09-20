@@ -1,11 +1,13 @@
 /*
  * Copyright (C) 2017 SignalFx, Inc.
  */
-package com.signalfx.lambda;
+package com.signalfx.lambda.wrapper;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.signalfx.endpoint.SignalFxEndpoint;
@@ -26,6 +28,8 @@ public class MetricWrapper implements Closeable {
     private static final String TIMEOUT_MS = "SIGNALFX_SEND_TIMEOUT";
 
     private final AggregateMetricSender.Session session;
+
+    private final List<SignalFxProtocolBuffers.Dimension> defaultDimensions = new LinkedList<>();
 
     public MetricWrapper(Context context) {
         String authToken = System.getenv(AUTH_TOKEN);
@@ -54,15 +58,40 @@ public class MetricWrapper implements Closeable {
                 new HttpEventProtobufReceiverFactory(signalFxEndpoint),
                 new StaticAuthToken(authToken),
                 Collections.<OnSendErrorHandler> singleton(metricError -> {
+                    System.out.println(metricError.getException());
                 }));
         session = metricSender.createSession();
 
-        //TODO: prebuilt dimensions
+        String[] splitted = functionArn.split(":");
+        if ("lambda".equals(splitted[2])) {
+            // only add if it's lambda arn
+            // formatting is per specification at http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-lambda
+            defaultDimensions.add(getDimensionAsProtoBuf("aws_region", splitted[3]));
+            defaultDimensions.add(getDimensionAsProtoBuf("aws_account_id", splitted[4]));
+            if ("function".equals(splitted[5])) {
+                defaultDimensions.add(getDimensionAsProtoBuf("aws_lambda_function_name", splitted[6]));
+                String functionVersion = splitted[7];
+
+                defaultDimensions.add(getDimensionAsProtoBuf("aws_lambda_function_version",
+                        functionVersion));
+            } else if ("event-source-mappings".equals(splitted[5])) {
+                defaultDimensions.add(getDimensionAsProtoBuf("event_source_mappings", splitted[6]));
+            }
+        }
+
+        MetricSender.setWrapper(this);
+    }
+
+    private static SignalFxProtocolBuffers.Dimension getDimensionAsProtoBuf(String key, String value){
+        return SignalFxProtocolBuffers.Dimension.newBuilder()
+                .setKey(key)
+                .setValue(value)
+                .build();
     }
 
     protected void sendMetric(SignalFxProtocolBuffers.DataPoint.Builder builder) {
+        builder.addAllDimensions(defaultDimensions);
         session.setDatapoint(builder.build());
-        //TODO: add all the dimensions that was prebuilt
     }
 
     @Override
