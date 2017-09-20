@@ -2,20 +2,39 @@
 
 SignalFx Java Lambda Wrapper.
 
-## Testing from the AWS Console
-1) Put pom.xml in the top level directory. Change groupId, artifactId, and name
-as appropriate.
-2) Put SignalFxLambdaMetricSender.java and LambdaOnSendErrorHandler.java with
-the other source files. E.g., under src/main/java/example/.
-3) Run `mvn package` in the top level directory.
-4) In the AWS Console, author a Lambda function from scratch.
-5) Fill in required fields. Change "Code entry type" to "Upload a .ZIP file"
+## Testing
+Test example is available at `com.signalfx.lambda.test.TestCustomHandler::handler`. Make appropriate changes if needed.
+
+### Environment Variable
+Either locally or on aws, following environment variable needs to be set:
+
+1) Set auth token variables:
+```
+ SIGNALFX_AUTH_TOKEN=signalfx token
+```
+2) Set the handler function in format `package.ClassName::methodName`
+```
+SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
+```
+3) Optional parameters available:
+```
+ SIGNALFX_API_HOSTNAME=[ingest.signalfx.com]
+ SIGNALFX_API_PORT=[443]
+ SIGNALFX_API_SCHEME=[https]
+ TIMEOUT_MS=milli second for signalfx client timeout [2000]
+```
+
+### Testing locally.
+1) Set test input event and lambda function handler
+```
+LAMBDA_INPUT_EVENT={"abc":"def"}
+SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
+```
+2) run `mvn compile exec:java`
+
+### Testing from the AWS Console
+1) Run `mvn compile package -Ptest` to package using test profile that will include runner and test handler.
+2) In the AWS Console, author a Lambda function from scratch.
+3) Fill in required fields. Change "Code entry type" to "Upload a .ZIP file"
 and upload target/<mvn-package-name>-1.0-SNAPSHOT.jar.
-6) Set the following environment variables:
-```
- SIGNALFX_API_HOSTNAME=ingest.signalfx.com
- SIGNALFX_API_PORT=443
- SIGNALFX_API_SCHEME=https
- SIGNALFX_AUTH_TOKEN=[token]
- TIMEOUT_MS=[millescondsToWaitForRequests] - optional
-```
+4) Set handler to `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest`

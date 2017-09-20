@@ -175,11 +175,4 @@ public class SignalFxRequestWrapper implements RequestHandler<Object, Object> {
             throw new RuntimeException(e);
         }
     }
-
-    /**
-     * Example event for java lambda runner.
-     */
-    public String getExampleEvent() {
-        return "{\"abc\":\"def\"}";
-    }
 }

@@ -5,12 +5,8 @@ package com.signalfx.lambda.runner;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-
-import org.apache.log4j.Logger;
 
 import com.amazonaws.services.lambda.runtime.ClientContext;
 import com.amazonaws.services.lambda.runtime.CognitoIdentity;
@@ -29,12 +25,7 @@ public final class LambdaRunner<I, O> {
     public static <I, O> void main(final String[] args) throws
             Exception {
 
-        LambdaLogger lambdaLogger = new LambdaLogger() {
-            @Override
-            public void log(String item) {
-                System.out.println(item);
-            }
-        };
+        LambdaLogger lambdaLogger = System.out::println;
 
         Context context = new Context() {
             public String getAwsRequestId() {
@@ -134,17 +125,10 @@ public final class LambdaRunner<I, O> {
         }
 
         ObjectMapper mapper = new ObjectMapper();
-
         try {
-            Method exampleEventMethod = handler.getClass().getMethod("getExampleEvent", (Class<?>[]) null);
-
-            if (exampleEventMethod.getReturnType() != String.class) {
-                throw new RuntimeException();
-            }
-
-            String json = (String) exampleEventMethod.invoke(handler);
+            String json = System.getenv("LAMBDA_INPUT_EVENT");
             return mapper.readValue((String) json, mapper.getTypeFactory().constructType(requestClass));
-        } catch (NoSuchMethodException | RuntimeException | IllegalAccessException | InvocationTargetException e) {
+        } catch (Exception e) {
             return mapper.readValue("{}", mapper.getTypeFactory().constructType(requestClass));
         }
     }
