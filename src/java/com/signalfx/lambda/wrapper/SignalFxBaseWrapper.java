@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.google.common.base.Strings;
 import com.signalfx.metrics.protobuf.SignalFxProtocolBuffers;
 
 /**
@@ -42,6 +43,9 @@ public abstract class SignalFxBaseWrapper {
 
     protected void instantiateTargetClass() {
         String functionSpec = System.getenv(SIGNALFX_LAMBDA_HANDLER);
+        if (Strings.isNullOrEmpty(functionSpec)) {
+            throw new RuntimeException(SIGNALFX_LAMBDA_HANDLER + " was not specified.");
+        }
 
         // expect format to be package.ClassName::methodName
         String[] splitted = functionSpec.split("::");

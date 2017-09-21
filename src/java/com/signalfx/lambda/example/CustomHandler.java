@@ -35,6 +35,5 @@ public class CustomHandler {
                                         .setDoubleValue(Math.random() * 100));
         MetricSender.sendMetric(builder);
         return "here";
-//        throw new RuntimeException("this is wrong");
     }
 }
