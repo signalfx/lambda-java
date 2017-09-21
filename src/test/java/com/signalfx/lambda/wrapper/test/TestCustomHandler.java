@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2017 SignalFx, Inc.
  */
-package com.signalfx.lambda.test;
+package com.signalfx.lambda.wrapper.test;
 
 import java.util.Map;
 
@@ -16,15 +16,26 @@ import com.signalfx.metrics.protobuf.SignalFxProtocolBuffers;
  */
 public class TestCustomHandler {
 
-    public String handler(Map<String, String> input) {
-        throw new RuntimeException("this is wrong");
+    public static final String CORRECT_INPUT = "correctInput";
+    public static final String CORRECT_OUTPUT = "correctOutput";
+    public static final String EXCEPTION_OUTPUT = "exceptionOutput";
+
+    private void verifyInput(String input) {
+        if (!CORRECT_INPUT.equals(input)) {
+            throw new RuntimeException("Input is in correct. Expected: " +
+                    CORRECT_INPUT + " but got: " + input);
+        }
+
     }
 
-    public String handler(Map<String, String> input, Context context)
+    public String handlerException(String input) {
+        verifyInput(input);
+        throw new RuntimeException(EXCEPTION_OUTPUT);
+    }
+
+    public String handler(String input, Context context)
             throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String str = objectMapper.writeValueAsString(input);
-        System.out.println(str);
+        verifyInput(input);
 
         SignalFxProtocolBuffers.DataPoint.Builder builder =
                 SignalFxProtocolBuffers.DataPoint.newBuilder()
@@ -34,7 +45,6 @@ public class TestCustomHandler {
                                 SignalFxProtocolBuffers.Datum.newBuilder()
                                         .setDoubleValue(Math.random() * 100));
         MetricSender.sendMetric(builder);
-        return "here";
-//        throw new RuntimeException("this is wrong");
+        return CORRECT_OUTPUT;
     }
 }
