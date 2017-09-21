@@ -66,7 +66,7 @@ public class MetricWrapper implements Closeable {
         if ("lambda".equals(splitted[2])) {
             // only add if it's lambda arn
             // formatting is per specification at http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-lambda
-            defaultDimensions.add(getDimensionAsProtoBuf("lambda_function_arn", functionArn));
+            defaultDimensions.add(getDimensionAsProtoBuf("lambda_arn", functionArn));
             defaultDimensions.add(getDimensionAsProtoBuf("aws_region", splitted[3]));
             defaultDimensions.add(getDimensionAsProtoBuf("aws_account_id", splitted[4]));
             if ("function".equals(splitted[5])) {
