@@ -45,20 +45,26 @@ public class MetricWrapper implements Closeable {
         // Create endpoint for ingest URL
         SignalFxReceiverEndpoint signalFxEndpoint = new SignalFxEndpoint();
 
-        // Create datapoint receiver for endpoint
-        HttpDataPointProtobufReceiverFactory receiver = new HttpDataPointProtobufReceiverFactory(signalFxEndpoint)
+        // Create datapoint dataPointReceiverFactory for endpoint
+        HttpDataPointProtobufReceiverFactory dataPointReceiverFactory = new HttpDataPointProtobufReceiverFactory(signalFxEndpoint)
                 .setVersion(2);
 
+        HttpEventProtobufReceiverFactory eventReceiverFactory = new HttpEventProtobufReceiverFactory(
+                signalFxEndpoint);
+
         if (timeoutMs > -1) {
-            receiver.setTimeoutMs(timeoutMs);
+            dataPointReceiverFactory.setTimeoutMs(timeoutMs);
+            eventReceiverFactory.setTimeoutMs(timeoutMs);
         }
 
         AggregateMetricSender metricSender = new AggregateMetricSender("",
-                receiver,
-                new HttpEventProtobufReceiverFactory(signalFxEndpoint),
+                dataPointReceiverFactory,
+                eventReceiverFactory,
                 new StaticAuthToken(authToken),
                 Collections.<OnSendErrorHandler> singleton(metricError -> {
+//                    System.out.println("metric sending error");
                     System.out.println(metricError.getException());
+//                    metricError.getException().printStackTrace();
                 }));
         session = metricSender.createSession();
 

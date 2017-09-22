@@ -21,7 +21,7 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
  SIGNALFX_API_HOSTNAME=[ingest.signalfx.com]
  SIGNALFX_API_PORT=[443]
  SIGNALFX_API_SCHEME=[https]
- TIMEOUT_MS=milli second for signalfx client timeout [2000]
+ SIGNALFX_SEND_TIMEOUT=milli second for signalfx client timeout [2000]
 ```
 
 ### Testing locally.
