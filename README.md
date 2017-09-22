@@ -33,7 +33,7 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
 2) run `mvn compile exec:java`
 
 ### Testing from the AWS Console
-1) Run `mvn compile package -Ptest` to package using test profile that will include runner and test handler.
+1) Run `mvn clean compile package -Ptest` to package using test profile that will include runner and test handler.
 2) In the AWS Console, author a Lambda function from scratch.
 3) Fill in required fields. Change "Code entry type" to "Upload a .ZIP file"
 and upload target/<mvn-package-name>-1.0-SNAPSHOT.jar.
