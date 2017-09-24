@@ -33,6 +33,7 @@ public class CustomHandler {
                         .setValue(
                                 SignalFxProtocolBuffers.Datum.newBuilder()
                                         .setDoubleValue(Math.random() * 100));
+        builder.addDimensionsBuilder().setKey("applicationName").setValue("CoolApp").build();
         MetricSender.sendMetric(builder);
         return "here";
     }

@@ -62,9 +62,7 @@ public class MetricWrapper implements Closeable {
                 eventReceiverFactory,
                 new StaticAuthToken(authToken),
                 Collections.<OnSendErrorHandler> singleton(metricError -> {
-//                    System.out.println("metric sending error");
-                    System.out.println(metricError.getException());
-//                    metricError.getException().printStackTrace();
+                    context.getLogger().log("Metric sending error");
                 }));
         session = metricSender.createSession();
 
@@ -76,7 +74,7 @@ public class MetricWrapper implements Closeable {
             defaultDimensions.add(getDimensionAsProtoBuf("aws_region", splitted[3]));
             defaultDimensions.add(getDimensionAsProtoBuf("aws_account_id", splitted[4]));
             if ("function".equals(splitted[5])) {
-                defaultDimensions.add(getDimensionAsProtoBuf("aws_lambda_function_name", splitted[6]));
+                defaultDimensions.add(getDimensionAsProtoBuf("aws_function_name", splitted[6]));
                 String functionVersion;
                 if (splitted.length == 6) {
                     functionVersion = splitted[7];
@@ -84,7 +82,7 @@ public class MetricWrapper implements Closeable {
                     functionVersion = context.getFunctionVersion();
                 }
 
-                defaultDimensions.add(getDimensionAsProtoBuf("aws_lambda_function_version",
+                defaultDimensions.add(getDimensionAsProtoBuf("aws_function_version",
                         functionVersion));
             } else if ("event-source-mappings".equals(splitted[5])) {
                 defaultDimensions.add(getDimensionAsProtoBuf("event_source_mappings", splitted[6]));

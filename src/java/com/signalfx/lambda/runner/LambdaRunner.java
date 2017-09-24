@@ -35,7 +35,7 @@ public final class LambdaRunner<I, O> {
         String handlerClassName = System.getenv("LAMBDA_RUNNER_HANDLER");
 
         if (Strings.isNullOrEmpty(handlerClassName)) {
-            throw new RuntimeException("You should give handler class name as an argument");
+            throw new RuntimeException("LAMBDA_RUNNER_HANDLER environment variable must be set");
         }
 
         Context context = new LambdaRunnerContext();
@@ -56,16 +56,21 @@ public final class LambdaRunner<I, O> {
             RequestHandler<I, O> requestHandler = (RequestHandler<I, O>) object;
             I requestObject = getRequestObject(requestHandler);
 
+            O output;
             try {
-                O output = requestHandler.handleRequest(requestObject, context);
-                System.out.println("SUCCESS: " + (new ObjectMapper().writeValueAsString(output)));
+                output = requestHandler.handleRequest(requestObject, context);
             } catch (RuntimeException e) {
                 System.out.println("FAIL:");
                 e.printStackTrace();
                 System.exit(1);
+                return;
             }
+            System.out.println("SUCCESS: " + (new ObjectMapper().writeValueAsString(output)));
         } else if (object instanceof RequestStreamHandler) {
             String input = System.getenv("LAMBDA_INPUT_EVENT");
+            if (input == null) {
+                input = "";
+            }
             InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()));
             OutputStream outputStream = new ByteArrayOutputStream();
 

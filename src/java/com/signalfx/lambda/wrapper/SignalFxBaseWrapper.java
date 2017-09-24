@@ -50,7 +50,7 @@ public abstract class SignalFxBaseWrapper {
         // expect format to be package.ClassName::methodName
         String[] splitted = functionSpec.split("::");
         if (splitted.length != 2) {
-            throw new RuntimeException(functionSpec + " is not a valid handler");
+            throw new RuntimeException(functionSpec + " is not a valid handler name. Expected format: package.ClassName::methodName");
         }
         String handlerClassName = splitted[0];
         targetMethodName = splitted[1];
@@ -65,17 +65,17 @@ public abstract class SignalFxBaseWrapper {
             throw new RuntimeException(handlerClassName + " not found in classpath");
         } catch (NoSuchMethodException e) {
             // no constructor found
-            throw new RuntimeException(handlerClassName + "  does not have appropriate constructor");
+            throw new RuntimeException(handlerClassName + " does not have an appropriate constructor");
         } catch (InstantiationException e) {
             // it's a call to an abstract class
-            throw new RuntimeException(handlerClassName + "  is an abstract class");
+            throw new RuntimeException(handlerClassName + " cannot be an abstract class");
         } catch (IllegalAccessException e) {
             // non accessible access to instantiate
-            throw new RuntimeException(handlerClassName + "'s  constructor is not accessible");
+            throw new RuntimeException(handlerClassName + "'s constructor is not accessible");
         } catch (InvocationTargetException e) {
             // constructor throws exception
             sendMetric(METRIC_NAME_ERROR, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
-            throw new RuntimeException(handlerClassName + " threw exception from constructor");
+            throw new RuntimeException(handlerClassName + " threw an exception from the constructor");
         }
     }
 }

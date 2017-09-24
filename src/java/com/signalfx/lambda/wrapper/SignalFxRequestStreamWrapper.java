@@ -30,7 +30,7 @@ public class SignalFxRequestStreamWrapper extends SignalFxBaseWrapper implements
             }
 
             if (!(targetObject instanceof RequestStreamHandler)) {
-                throw new RuntimeException(targetClass.getName() + " is not instance of RequestStreamHandler");
+                throw new RuntimeException(targetClass.getName() + " is not an instance of RequestStreamHandler");
             }
 
             try {
