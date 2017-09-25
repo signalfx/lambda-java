@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2017 SignalFx, Inc.
  */
-package com.signalfx.lambda.test;
+package com.signalfx.lambda.example;
 
 import java.util.Map;
 
@@ -14,7 +14,7 @@ import com.signalfx.metrics.protobuf.SignalFxProtocolBuffers;
 /**
  * @author park
  */
-public class TestCustomHandler {
+public class CustomHandler {
 
     public String handler(Map<String, String> input) {
         throw new RuntimeException("this is wrong");
@@ -33,8 +33,8 @@ public class TestCustomHandler {
                         .setValue(
                                 SignalFxProtocolBuffers.Datum.newBuilder()
                                         .setDoubleValue(Math.random() * 100));
+        builder.addDimensionsBuilder().setKey("applicationName").setValue("CoolApp").build();
         MetricSender.sendMetric(builder);
         return "here";
-//        throw new RuntimeException("this is wrong");
     }
 }

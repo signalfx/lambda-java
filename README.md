@@ -3,7 +3,7 @@
 SignalFx Java Lambda Wrapper.
 
 ## Testing
-Test example is available at `com.signalfx.lambda.test.TestCustomHandler::handler`. Make appropriate changes if needed.
+Test example is available at `com.signalfx.lambda.example.CustomHandler::handler`. Make appropriate changes if needed.
 
 ### Environment Variable
 Either locally or on aws, following environment variable needs to be set:
@@ -21,7 +21,7 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
  SIGNALFX_API_HOSTNAME=[ingest.signalfx.com]
  SIGNALFX_API_PORT=[443]
  SIGNALFX_API_SCHEME=[https]
- TIMEOUT_MS=milli second for signalfx client timeout [2000]
+ SIGNALFX_SEND_TIMEOUT=milliseconds for signalfx client timeout [2000]
 ```
 
 ### Testing locally.
@@ -33,8 +33,10 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
 2) run `mvn compile exec:java`
 
 ### Testing from the AWS Console
-1) Run `mvn compile package -Ptest` to package using test profile that will include runner and test handler.
+1) Run `mvn clean compile package -Ptest` to package using test profile, which will include runner and test handler.
 2) In the AWS Console, author a Lambda function from scratch.
 3) Fill in required fields. Change "Code entry type" to "Upload a .ZIP file"
 and upload target/<mvn-package-name>-1.0-SNAPSHOT.jar.
-4) Set handler to `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest`
+4) Set handler to
+- `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal Input/Output request
+- `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal Stream request

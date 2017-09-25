@@ -3,17 +3,24 @@
  */
 package com.signalfx.lambda.runner;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 
 import com.amazonaws.services.lambda.runtime.ClientContext;
 import com.amazonaws.services.lambda.runtime.CognitoIdentity;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 
 /**
  * LambdaRunner to run lambda locally.
@@ -25,60 +32,13 @@ public final class LambdaRunner<I, O> {
     public static <I, O> void main(final String[] args) throws
             Exception {
 
-        LambdaLogger lambdaLogger = System.out::println;
+        String handlerClassName = System.getenv("LAMBDA_RUNNER_HANDLER");
 
-        Context context = new Context() {
-            public String getAwsRequestId() {
-                return "someRandomId";
-            }
-
-            public String getLogGroupName() {
-                return "logGroupName";
-            }
-
-            public String getLogStreamName() {
-                return "logStreamName";
-            }
-
-            public String getFunctionName() {
-                return "TestFunctionName";
-            }
-
-            public String getFunctionVersion() {
-                return "$LATEST";
-            }
-
-            public String getInvokedFunctionArn() {
-                return "arn:aws:lambda:us-east-1:123456789012:function:LambdaRunnerTest:1.234";
-            }
-
-            public CognitoIdentity getIdentity() {
-                return null;
-            }
-
-            public ClientContext getClientContext() {
-                return null;
-            }
-
-            public int getRemainingTimeInMillis() {
-                return 0;
-            }
-
-            public int getMemoryLimitInMB() {
-                return 0;
-            }
-
-            public LambdaLogger getLogger() {
-                return lambdaLogger;
-            }
-        };
-
-
-        if (args.length != 1) {
-            throw new RuntimeException("You should give handler class name as an argument");
+        if (Strings.isNullOrEmpty(handlerClassName)) {
+            throw new RuntimeException("LAMBDA_RUNNER_HANDLER environment variable must be set");
         }
 
-        String handlerClassName = args[0];
+        Context context = new LambdaRunnerContext();
 
         Object object;
         try {
@@ -90,21 +50,40 @@ public final class LambdaRunner<I, O> {
             throw new RuntimeException(handlerClassName + " not found in classpath");
         }
 
-        if (!(object instanceof RequestHandler)) {
-            throw new RuntimeException("Request handler class does not implement " + RequestHandler.class + " interface");
-        }
+        if (object instanceof RequestHandler) {
 
-        @SuppressWarnings("unchecked")
-        RequestHandler<I, O> requestHandler = (RequestHandler<I, O>) object;
-        I requestObject = getRequestObject(requestHandler);
+            @SuppressWarnings("unchecked")
+            RequestHandler<I, O> requestHandler = (RequestHandler<I, O>) object;
+            I requestObject = getRequestObject(requestHandler);
 
-        try {
-            O output = requestHandler.handleRequest(requestObject, context);
+            O output;
+            try {
+                output = requestHandler.handleRequest(requestObject, context);
+            } catch (RuntimeException e) {
+                System.out.println("FAIL:");
+                e.printStackTrace();
+                System.exit(1);
+                return;
+            }
             System.out.println("SUCCESS: " + (new ObjectMapper().writeValueAsString(output)));
-        } catch (RuntimeException e) {
-            System.out.println("FAIL:");
-            e.printStackTrace();
-            System.exit(1);
+        } else if (object instanceof RequestStreamHandler) {
+            String input = System.getenv("LAMBDA_INPUT_EVENT");
+            if (input == null) {
+                input = "";
+            }
+            InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8.name()));
+            OutputStream outputStream = new ByteArrayOutputStream();
+
+            try {
+                ((RequestStreamHandler)object).handleRequest(inputStream, outputStream, context);
+            } catch (RuntimeException e) {
+                System.out.println("FAIL:");
+                e.printStackTrace();
+                System.exit(1);
+            }
+            System.out.println("SUCCESS: " + outputStream.toString());
+        } else {
+            throw new RuntimeException("Request handler class does not implement " + RequestHandler.class + " or " + RequestStreamHandler.class +" interface");
         }
 
     }
