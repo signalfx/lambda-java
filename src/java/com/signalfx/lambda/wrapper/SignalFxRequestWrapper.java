@@ -4,7 +4,6 @@
 package com.signalfx.lambda.wrapper;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -103,7 +102,7 @@ public class SignalFxRequestWrapper extends SignalFxBaseWrapper implements Reque
                 throw new RuntimeException("something went wrong", e);
             }
             sendMetric(METRIC_NAME_COMPLETE, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
-            sendMetric(METRIC_NAME_EXECUATION_TIME, SignalFxProtocolBuffers.MetricType.GAUGE,
+            sendMetric(METRIC_NAME_DURATION, SignalFxProtocolBuffers.MetricType.GAUGE,
                     System.nanoTime() - startTime);
             return returnObj;
         } catch (IOException e) {

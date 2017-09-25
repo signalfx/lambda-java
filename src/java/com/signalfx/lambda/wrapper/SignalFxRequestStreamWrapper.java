@@ -41,7 +41,7 @@ public class SignalFxRequestStreamWrapper extends SignalFxBaseWrapper implements
                 throw e;
             } finally {
                 sendMetric(METRIC_NAME_COMPLETE, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
-                sendMetric(METRIC_NAME_EXECUATION_TIME, SignalFxProtocolBuffers.MetricType.GAUGE,
+                sendMetric(METRIC_NAME_DURATION, SignalFxProtocolBuffers.MetricType.GAUGE,
                         System.nanoTime() - startTime);
             }
         } catch (Exception e) {

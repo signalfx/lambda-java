@@ -20,7 +20,7 @@ public abstract class SignalFxBaseWrapper {
     protected static final String METRIC_NAME_INVOCATION = METRIC_NAME_PREFIX + "invocation";
     protected static final String METRIC_NAME_COLD_START = METRIC_NAME_PREFIX + "coldStart";
     protected static final String METRIC_NAME_ERROR = METRIC_NAME_PREFIX + "error";
-    protected static final String METRIC_NAME_EXECUATION_TIME = METRIC_NAME_PREFIX + "executionTime";
+    protected static final String METRIC_NAME_DURATION = METRIC_NAME_PREFIX + "duration";
     protected static final String METRIC_NAME_COMPLETE = METRIC_NAME_PREFIX + "complete";
 
     protected Object targetObject;
