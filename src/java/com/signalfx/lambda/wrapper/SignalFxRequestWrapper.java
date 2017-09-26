@@ -59,7 +59,7 @@ public class SignalFxRequestWrapper extends SignalFxBaseWrapper implements Reque
 
     @Override
     public Object handleRequest(Object input, Context context) {
-        try (MetricWrapper _ = new MetricWrapper(context)) {
+        try (MetricWrapper wrapper = new MetricWrapper(context)) {
             long startTime = System.nanoTime();
             sendMetric(METRIC_NAME_INVOCATION, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
             if (targetMethod == null) {

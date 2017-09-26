@@ -13,10 +13,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
-import com.amazonaws.services.lambda.runtime.ClientContext;
-import com.amazonaws.services.lambda.runtime.CognitoIdentity;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,12 +57,12 @@ public final class LambdaRunner<I, O> {
             try {
                 output = requestHandler.handleRequest(requestObject, context);
             } catch (RuntimeException e) {
-                System.out.println("FAIL:");
+                System.out.println("Error running lambda:");
                 e.printStackTrace();
                 System.exit(1);
                 return;
             }
-            System.out.println("SUCCESS: " + (new ObjectMapper().writeValueAsString(output)));
+            System.out.println("Result: " + (new ObjectMapper().writeValueAsString(output)));
         } else if (object instanceof RequestStreamHandler) {
             String input = System.getenv("LAMBDA_INPUT_EVENT");
             if (input == null) {
@@ -77,9 +74,10 @@ public final class LambdaRunner<I, O> {
             try {
                 ((RequestStreamHandler)object).handleRequest(inputStream, outputStream, context);
             } catch (RuntimeException e) {
-                System.out.println("FAIL:");
+                System.out.println("Error running lambda:");
                 e.printStackTrace();
                 System.exit(1);
+                return;
             }
             System.out.println("SUCCESS: " + outputStream.toString());
         } else {
@@ -106,7 +104,7 @@ public final class LambdaRunner<I, O> {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String json = System.getenv("LAMBDA_INPUT_EVENT");
-            return mapper.readValue((String) json, mapper.getTypeFactory().constructType(requestClass));
+            return mapper.readValue(json, mapper.getTypeFactory().constructType(requestClass));
         } catch (Exception e) {
             return mapper.readValue("{}", mapper.getTypeFactory().constructType(requestClass));
         }

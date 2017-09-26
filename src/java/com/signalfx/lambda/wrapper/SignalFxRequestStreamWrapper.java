@@ -3,7 +3,6 @@
  */
 package com.signalfx.lambda.wrapper;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -17,9 +16,8 @@ import com.signalfx.metrics.protobuf.SignalFxProtocolBuffers;
 public class SignalFxRequestStreamWrapper extends SignalFxBaseWrapper implements RequestStreamHandler {
 
     @Override
-    public void handleRequest(InputStream input, OutputStream output, Context context)
-            throws IOException {
-        try (MetricWrapper _ = new MetricWrapper(context)) {
+    public void handleRequest(InputStream input, OutputStream output, Context context) {
+        try (MetricWrapper wrapper = new MetricWrapper(context)) {
             long startTime = System.nanoTime();
             sendMetric(METRIC_NAME_INVOCATION, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
             if (targetClass == null) {
