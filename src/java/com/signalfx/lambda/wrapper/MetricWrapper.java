@@ -76,7 +76,7 @@ public class MetricWrapper implements Closeable {
             if ("function".equals(splitted[5])) {
                 defaultDimensions.add(getDimensionAsProtoBuf("aws_function_name", splitted[6]));
                 String functionVersion;
-                if (splitted.length == 6) {
+                if (splitted.length == 8) {
                     functionVersion = splitted[7];
                 } else {
                     functionVersion = context.getFunctionVersion();
