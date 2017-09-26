@@ -7,7 +7,7 @@
     <artifactId>signalfx-lambda</artifactId>
     <packaging>jar</packaging>
     <version>0.0.1-SNAPSHOT</version>
-    <name>SingalFx Lambda Wrapper</name>
+    <name>SignalFx Lambda Wrapper</name>
     <description>
         SignalFx Lambda Wrapper
     </description>

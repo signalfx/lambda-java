@@ -8,9 +8,9 @@ SignalFx Java Lambda Wrapper.
 
 ## Usage
 
-SignalFx Java Lambda Wrapper is a wrapper to instrument execution of Java Lambda as well sending metrics to SignalFx inside AWS Lambda.
+The SignalFx Java Lambda Wrapper is a wrapper around an AWS Lambda Java function handler, used to instrument execution of the function and send metrics to SignalFx.
 
-### Install via maven dependency:
+### Install via maven dependency
 ```xml
 <dependency>
   <groupId>com.signalfx.public</groupId>
@@ -23,12 +23,12 @@ SignalFx Java Lambda Wrapper is a wrapper to instrument execution of Java Lambda
 Package jar file and upload to AWS per [instructions here](http://docs.aws.amazon.com/lambda/latest/dg/java-create-jar-pkg-maven-no-ide.html)
 
 ### Handler
-Set handler to
+Configure Handler for the function to be:
 - `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal Input/Output request
 - `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal Stream request
 
 ### Environment Variable
-Set the Lambda environment variable as followed:
+Set the Lambda environment variables as follows:
 
 1) Set auth token variables:
 ```
@@ -45,7 +45,7 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
  SIGNALFX_API_SCHEME=[https]
  SIGNALFX_SEND_TIMEOUT=milliseconds for signalfx client timeout [2000]
 
-### Sending metric from lambda
+### Sending a metric from the Lambda function
 ```java
 // construct data point builder
 SignalFxProtocolBuffers.DataPoint.Builder builder =
@@ -56,7 +56,7 @@ SignalFxProtocolBuffers.DataPoint.Builder builder =
                         SignalFxProtocolBuffers.Datum.newBuilder()
                                 .setDoubleValue(100));
 
-// add any additional dimension
+// add custom dimension
 builder.addDimensionsBuilder().setKey("applicationName").setValue("CoolApp").build();
 
 // send the metric
@@ -75,7 +75,7 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
 2) run `mvn compile exec:java`
 
 ### Testing from the AWS Console
-1)Run `mvn clean compile package -Ptest` to package using test profile, which will include runner and test handler.
+1) Run `mvn clean compile package -Ptest` to package using test profile, which will include runner and test handler.
 
 2) Set the signalfx lambda handler environment variable to either
 `com.signalfx.lambda.example.CustomHandler::handler` or `com.signalfx.lambda.example.CustomStreamHandler::handleRequest`
