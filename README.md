@@ -36,7 +36,7 @@ Set the Lambda environment variables as follows:
 ```
 2) Set the handler function in format `package.ClassName::methodName`
 ```
-SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
+SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
 ```
 3) Optional parameters available:
 ```
@@ -70,12 +70,12 @@ Test example is available at `com.signalfx.lambda.example.CustomHandler::handler
 1) Set test input event and lambda function handler
 ```
 LAMBDA_INPUT_EVENT={"abc":"def"}
-SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
+SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
 ```
 2) run `mvn compile exec:java`
 
 ### Testing from the AWS Console
-1) Run `mvn clean compile package -Ptest` to package using test profile, which will include runner and test handler.
+1)Run `mvn clean compile package -Ptest` to package using test profile, which will include runner and test handler.
 
 2) Set the signalfx lambda handler environment variable to either
 `com.signalfx.lambda.example.CustomHandler::handler` or `com.signalfx.lambda.example.CustomStreamHandler::handleRequest`
