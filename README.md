@@ -2,11 +2,33 @@
 
 SignalFx Java Lambda Wrapper.
 
-## Testing
-Test example is available at `com.signalfx.lambda.example.CustomHandler::handler`. Make appropriate changes if needed.
+## Supported Languages
+
+* Java 7+
+
+## Usage
+
+SignalFx Java Lambda Wrapper is a wrapper to instrument execution of Java Lambda as well sending metrics to SignalFx inside AWS Lambda.
+
+### Install via maven dependency:
+```xml
+<dependency>
+  <groupId>com.signalfx.public</groupId>
+  <artifactId>signalfx-lambda</artifactId>
+  <version>0.0.1</version>
+</dependency>
+```
+
+###  Package
+Package jar file and upload to AWS per [instructions here](http://docs.aws.amazon.com/lambda/latest/dg/java-create-jar-pkg-maven-no-ide.html)
+
+### Handler
+Set handler to
+- `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal Input/Output request
+- `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal Stream request
 
 ### Environment Variable
-Either locally or on aws, following environment variable needs to be set:
+Set the Lambda environment variable as followed:
 
 1) Set auth token variables:
 ```
@@ -22,7 +44,27 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
  SIGNALFX_API_PORT=[443]
  SIGNALFX_API_SCHEME=[https]
  SIGNALFX_SEND_TIMEOUT=milliseconds for signalfx client timeout [2000]
+
+### Sending metric from lambda
+```java
+// construct data point builder
+SignalFxProtocolBuffers.DataPoint.Builder builder =
+        SignalFxProtocolBuffers.DataPoint.newBuilder()
+                .setMetric("application.metric")
+                .setMetricType(SignalFxProtocolBuffers.MetricType.GAUGE)
+                .setValue(
+                        SignalFxProtocolBuffers.Datum.newBuilder()
+                                .setDoubleValue(100));
+
+// add any additional dimension
+builder.addDimensionsBuilder().setKey("applicationName").setValue("CoolApp").build();
+
+// send the metric
+MetricSender.sendMetric(builder);
 ```
+
+## Testing
+Test example is available at `com.signalfx.lambda.example.CustomHandler::handler`. Make appropriate changes if needed.
 
 ### Testing locally.
 1) Set test input event and lambda function handler
@@ -33,10 +75,11 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.TestCustomHandler::handler
 2) run `mvn compile exec:java`
 
 ### Testing from the AWS Console
-1) Run `mvn clean compile package -Ptest` to package using test profile, which will include runner and test handler.
-2) In the AWS Console, author a Lambda function from scratch.
-3) Fill in required fields. Change "Code entry type" to "Upload a .ZIP file"
-and upload target/<mvn-package-name>-1.0-SNAPSHOT.jar.
-4) Set handler to
-- `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal Input/Output request
-- `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal Stream request
+1)Run `mvn clean compile package -Ptest` to package using test profile, which will include runner and test handler.
+
+2) Set the signalfx lambda handler environment variable to either
+`com.signalfx.lambda.example.CustomHandler::handler` or `com.signalfx.lambda.example.CustomStreamHandler::handleRequest`
+
+## License
+
+Apache Software License v2. Copyright © 2014-2017 SignalFx
