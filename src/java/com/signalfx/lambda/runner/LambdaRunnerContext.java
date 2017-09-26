@@ -40,7 +40,7 @@ public class LambdaRunnerContext implements Context {
 
     @Override
     public String getInvokedFunctionArn() {
-        return "arn:aws:lambda:us-east-1:123456789012:function:LambdaRunnerTest:1.234";
+        return "arn:aws:lambda:us-east-2:someAccountId:function:LambdaRunnerTest:1.234";
     }
 
     @Override
