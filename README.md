@@ -20,21 +20,22 @@ The SignalFx Java Lambda Wrapper is a wrapper around an AWS Lambda Java function
 ```
 
 ###  Package
-Package jar file and upload to AWS per [instructions here](http://docs.aws.amazon.com/lambda/latest/dg/java-create-jar-pkg-maven-no-ide.html)
+Package jar file and upload to AWS per instructions [here](http://docs.aws.amazon.com/lambda/latest/dg/java-create-jar-pkg-maven-no-ide.html).
 
 ### Handler
-Configure Handler for the function to be:
-- `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal Input/Output request
-- `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal Stream request
+Configure Handler for the function in AWS to be:
+
+* `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal Input/Output request
+* `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal Stream request
 
 ### Environment Variable
 Set the Lambda environment variables as follows:
 
-1) Set auth token variables:
+1) Set authentication token:
 ```
  SIGNALFX_AUTH_TOKEN=signalfx token
 ```
-2) Set the handler function in format `package.ClassName::methodName`
+2) Set the handler function in format `package.ClassName::methodName`:
 ```
 SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
 ```
@@ -68,18 +69,18 @@ MetricSender.sendMetric(builder);
 Test example is available at `com.signalfx.lambda.example.CustomHandler::handler`. Make appropriate changes if needed.
 
 ### Testing locally.
-1) Set test input event and lambda function handler
+1) Set test input event and lambda function handler:
 ```
-LAMBDA_INPUT_EVENT={"abc":"def"}
+LAMBDA_INPUT_EVENT={"abc": "def"}
 SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
 ```
-2) run `mvn compile exec:java`
+2) Run `mvn compile exec:java`.
 
 ### Testing from the AWS Console
-1)Run `mvn clean compile package -Ptest` to package using test profile, which will include runner and test handler.
+1) Run `mvn clean compile package -Ptest` to package using the test profile, which will include the runner and test handler.
 
-2) Set the signalfx lambda handler environment variable to either
-`com.signalfx.lambda.example.CustomHandler::handler` or `com.signalfx.lambda.example.CustomStreamHandler::handleRequest`
+2) Set the SignalFx Lambda handler environment variable to either
+`com.signalfx.lambda.example.CustomHandler::handler` or `com.signalfx.lambda.example.CustomStreamHandler::handleRequest`.
 
 ## License
 
