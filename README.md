@@ -44,6 +44,7 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
  SIGNALFX_API_PORT=[443]
  SIGNALFX_API_SCHEME=[https]
  SIGNALFX_SEND_TIMEOUT=milliseconds for signalfx client timeout [2000]
+```
 
 ### Sending a metric from the Lambda function
 ```java
