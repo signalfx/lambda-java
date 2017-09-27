@@ -10,6 +10,12 @@ SignalFx Java Lambda Wrapper.
 
 The SignalFx Java Lambda Wrapper is a wrapper around an AWS Lambda Java function handler, used to instrument execution of the function and send metrics to SignalFx.
 
+### Download jar file
+Use the jar file from https://cdn.signalfx.com/signalfx-lambda-0.0.1.jar and install it to your local maven repository with following parameters:
+- groupId: `com.signalfx.public`
+- artifactId: `signalfx-lambda`
+- version: `0.0.1`
+
 ### Install via maven dependency
 ```xml
 <dependency>
