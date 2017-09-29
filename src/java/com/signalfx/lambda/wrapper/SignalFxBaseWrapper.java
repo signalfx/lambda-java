@@ -17,11 +17,11 @@ public abstract class SignalFxBaseWrapper {
 
     // metric names
     protected static final String METRIC_NAME_PREFIX = "aws.lambda.";
-    protected static final String METRIC_NAME_INVOCATION = METRIC_NAME_PREFIX + "invocation";
-    protected static final String METRIC_NAME_COLD_START = METRIC_NAME_PREFIX + "coldStart";
-    protected static final String METRIC_NAME_ERROR = METRIC_NAME_PREFIX + "error";
+    protected static final String METRIC_NAME_INVOCATIONS = METRIC_NAME_PREFIX + "invocations";
+    protected static final String METRIC_NAME_COLD_STARTS = METRIC_NAME_PREFIX + "coldStarts";
+    protected static final String METRIC_NAME_ERRORS = METRIC_NAME_PREFIX + "errors";
     protected static final String METRIC_NAME_DURATION = METRIC_NAME_PREFIX + "duration";
-    protected static final String METRIC_NAME_COMPLETE = METRIC_NAME_PREFIX + "complete";
+    protected static final String METRIC_NAME_COMPLETED = METRIC_NAME_PREFIX + "completed";
 
     protected Object targetObject;
     protected Class<?> targetClass;
@@ -74,7 +74,7 @@ public abstract class SignalFxBaseWrapper {
             throw new RuntimeException(handlerClassName + "'s constructor is not accessible");
         } catch (InvocationTargetException e) {
             // constructor throws exception
-            sendMetric(METRIC_NAME_ERROR, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+            sendMetric(METRIC_NAME_ERRORS, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
             throw new RuntimeException(handlerClassName + " threw an exception from the constructor");
         }
     }
