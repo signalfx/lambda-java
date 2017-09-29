@@ -19,12 +19,12 @@ public class SignalFxRequestStreamWrapper extends SignalFxBaseWrapper implements
     public void handleRequest(InputStream input, OutputStream output, Context context) {
         try (MetricWrapper wrapper = new MetricWrapper(context)) {
             long startTime = System.nanoTime();
-            sendMetric(METRIC_NAME_INVOCATION, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+            sendMetric(METRIC_NAME_INVOCATIONS, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
             if (targetClass == null) {
                 instantiateTargetClass();
 
                 // assume cold start
-                sendMetric(METRIC_NAME_COLD_START, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+                sendMetric(METRIC_NAME_COLD_STARTS, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
             }
 
             if (!(targetObject instanceof RequestStreamHandler)) {
@@ -35,7 +35,7 @@ public class SignalFxRequestStreamWrapper extends SignalFxBaseWrapper implements
                 ((RequestStreamHandler) targetObject).handleRequest(input, output, context);
             } catch (Exception e) {
                 // Underlying method throw exception
-                sendMetric(METRIC_NAME_ERROR, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+                sendMetric(METRIC_NAME_ERRORS, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
                 throw e;
             } finally {
                 sendMetric(METRIC_NAME_COMPLETE, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
