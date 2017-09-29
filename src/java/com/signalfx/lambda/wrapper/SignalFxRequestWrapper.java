@@ -61,13 +61,13 @@ public class SignalFxRequestWrapper extends SignalFxBaseWrapper implements Reque
     public Object handleRequest(Object input, Context context) {
         try (MetricWrapper wrapper = new MetricWrapper(context)) {
             long startTime = System.nanoTime();
-            sendMetric(METRIC_NAME_INVOCATION, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+            sendMetric(METRIC_NAME_INVOCATIONS, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
             if (targetMethod == null) {
                 instantiateTargetClass();
                 targetMethod = getTargetMethod();
 
                 // assume cold start
-                sendMetric(METRIC_NAME_COLD_START, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+                sendMetric(METRIC_NAME_COLD_STARTS, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
             }
 
             Class<?>[] parameterTypes = targetMethod.getParameterTypes();
@@ -95,7 +95,7 @@ public class SignalFxRequestWrapper extends SignalFxBaseWrapper implements Reque
                 throw new RuntimeException("Method is inaccessible");
             } catch (InvocationTargetException e) {
                 // Underlying method throw exception
-                sendMetric(METRIC_NAME_ERROR, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+                sendMetric(METRIC_NAME_ERRORS, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
                 throw new RuntimeException(e.getTargetException());
             } catch (Exception e) {
                 // something else
