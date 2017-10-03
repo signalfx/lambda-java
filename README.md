@@ -22,11 +22,24 @@ The SignalFx Java Lambda Wrapper is a wrapper around an AWS Lambda Java function
 ###  Package
 Package jar file and upload to AWS per instructions [here](http://docs.aws.amazon.com/lambda/latest/dg/java-create-jar-pkg-maven-no-ide.html).
 
-### Handler
+### Using SignalFx Handler (preferred)
 Configure Handler for the function in AWS to be:
 
 * `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal Input/Output request
 * `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal Stream request
+
+### Using your own Handler and manually wrap your code
+```java
+// in your handler
+MetricWrapper wrapper = new MetricWrapper(context)
+try {
+    // your code
+} catch (Exception e) {
+    wrapper.error();
+} finally {
+    wrapper.close();
+}
+```
 
 ### Environment Variable
 Set the Lambda environment variables as follows:
@@ -35,7 +48,7 @@ Set the Lambda environment variables as follows:
 ```
  SIGNALFX_AUTH_TOKEN=signalfx token
 ```
-2) Set the handler function in format `package.ClassName::methodName`:
+2) Set the handler function in format `package.ClassName::methodName` (Skip this if you use your own handler):
 ```
 SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
 ```

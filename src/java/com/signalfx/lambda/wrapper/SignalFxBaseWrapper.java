@@ -13,15 +13,7 @@ import com.signalfx.metrics.protobuf.SignalFxProtocolBuffers;
 /**
  * @author park
  */
-public abstract class SignalFxBaseWrapper {
-
-    // metric names
-    protected static final String METRIC_NAME_PREFIX = "aws.lambda.";
-    protected static final String METRIC_NAME_INVOCATIONS = METRIC_NAME_PREFIX + "invocations";
-    protected static final String METRIC_NAME_COLD_STARTS = METRIC_NAME_PREFIX + "coldStarts";
-    protected static final String METRIC_NAME_ERRORS = METRIC_NAME_PREFIX + "errors";
-    protected static final String METRIC_NAME_DURATION = METRIC_NAME_PREFIX + "duration";
-    protected static final String METRIC_NAME_COMPLETED = METRIC_NAME_PREFIX + "completed";
+abstract class SignalFxBaseWrapper {
 
     protected Object targetObject;
     protected Class<?> targetClass;
@@ -30,18 +22,7 @@ public abstract class SignalFxBaseWrapper {
 
     protected static final String SIGNALFX_LAMBDA_HANDLER = "SIGNALFX_LAMBDA_HANDLER";
 
-    protected void sendMetric(String metricName, SignalFxProtocolBuffers.MetricType metricType, long value) {
-        SignalFxProtocolBuffers.DataPoint.Builder builder =
-                SignalFxProtocolBuffers.DataPoint.newBuilder()
-                        .setMetric(metricName)
-                        .setMetricType(metricType)
-                        .setValue(
-                                SignalFxProtocolBuffers.Datum.newBuilder()
-                                        .setIntValue(value));
-        MetricSender.sendMetric(builder);
-    }
-
-    protected void instantiateTargetClass() {
+    protected void instantiateTargetClass(MetricWrapper wrapper) {
         String functionSpec = System.getenv(SIGNALFX_LAMBDA_HANDLER);
         if (Strings.isNullOrEmpty(functionSpec)) {
             throw new RuntimeException(SIGNALFX_LAMBDA_HANDLER + " was not specified.");
@@ -74,7 +55,7 @@ public abstract class SignalFxBaseWrapper {
             throw new RuntimeException(handlerClassName + "'s constructor is not accessible");
         } catch (InvocationTargetException e) {
             // constructor throws exception
-            sendMetric(METRIC_NAME_ERRORS, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+            wrapper.error();
             throw new RuntimeException(handlerClassName + " threw an exception from the constructor");
         }
     }
