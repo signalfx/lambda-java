@@ -55,8 +55,6 @@ public class MetricWrapper implements Closeable {
             // use default
         }
 
-        String functionArn = context.getInvokedFunctionArn();
-
         // Create endpoint for ingest URL
         SignalFxReceiverEndpoint signalFxEndpoint = new SignalFxEndpoint();
 
@@ -152,11 +150,9 @@ public class MetricWrapper implements Closeable {
 
     @Override
     public void close() throws IOException {
-
         sendMetric(METRIC_NAME_COMPLETED, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
         sendMetric(METRIC_NAME_DURATION, SignalFxProtocolBuffers.MetricType.GAUGE,
                 System.nanoTime() - startTime);
-
         session.close();
     }
 }

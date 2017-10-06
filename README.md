@@ -21,7 +21,7 @@ Use the jar file from https://cdn.signalfx.com/signalfx-lambda-0.0.1.jar and ins
 <dependency>
   <groupId>com.signalfx.public</groupId>
   <artifactId>signalfx-lambda</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
 </dependency>
 ```
 
