@@ -46,6 +46,11 @@ public class MetricWrapper implements Closeable {
     private final long startTime;
 
     public MetricWrapper(Context context) {
+        this(context, null);
+    }
+
+    public MetricWrapper(Context context,
+                         List<SignalFxProtocolBuffers.Dimension> dimensions) {
         String authToken = System.getenv(AUTH_TOKEN);
         int timeoutMs = -1;
         try {
@@ -77,10 +82,14 @@ public class MetricWrapper implements Closeable {
                     context.getLogger().log("Metric sending error");
                 }));
         session = metricSender.createSession();
-
-        defaultDimensions = getDefaultDimensions(context).entrySet().stream().map(
+        
+        this.defaultDimensions = getDefaultDimensions(context).entrySet().stream().map(
                 e -> getDimensionAsProtoBuf(e.getKey(), e.getValue())
         ).collect(Collectors.toList());
+
+        if (dimensions != null) {
+            this.defaultDimensions.addAll(dimensions);
+        }
 
         MetricSender.setWrapper(this);
 
@@ -97,6 +106,8 @@ public class MetricWrapper implements Closeable {
         String functionArn = context.getInvokedFunctionArn();
         String[] splitted = functionArn.split(":");
         if ("lambda".equals(splitted[2])) {
+            defaultDimensions.put("aws_function_name", context.getFunctionName());
+            defaultDimensions.put("aws_function_version", context.getFunctionVersion());
             // only add if it's lambda arn
             // formatting is per specification at http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-lambda
             defaultDimensions.put("lambda_arn", functionArn);
@@ -104,14 +115,9 @@ public class MetricWrapper implements Closeable {
             defaultDimensions.put("aws_account_id", splitted[4]);
             if ("function".equals(splitted[5])) {
                 defaultDimensions.put("aws_function_name", splitted[6]);
-                String functionVersion;
                 if (splitted.length == 8) {
-                    functionVersion = splitted[7];
-                } else {
-                    functionVersion = context.getFunctionVersion();
+                    defaultDimensions.put("aws_function_qualifier", splitted[7]);
                 }
-
-                defaultDimensions.put("aws_function_version", functionVersion);
             } else if ("event-source-mappings".equals(splitted[5])) {
                 defaultDimensions.put("event_source_mappings", splitted[6]);
             }
