@@ -36,7 +36,6 @@ public class MetricWrapper implements Closeable {
     protected static final String METRIC_NAME_COLD_STARTS = METRIC_NAME_PREFIX + "coldStarts";
     protected static final String METRIC_NAME_ERRORS = METRIC_NAME_PREFIX + "errors";
     protected static final String METRIC_NAME_DURATION = METRIC_NAME_PREFIX + "duration";
-    protected static final String METRIC_NAME_COMPLETED = METRIC_NAME_PREFIX + "completed";
 
     private final AggregateMetricSender.Session session;
 
@@ -150,7 +149,6 @@ public class MetricWrapper implements Closeable {
 
     @Override
     public void close() throws IOException {
-        sendMetric(METRIC_NAME_COMPLETED, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
         sendMetric(METRIC_NAME_DURATION, SignalFxProtocolBuffers.MetricType.GAUGE,
                 System.nanoTime() - startTime);
         session.close();
