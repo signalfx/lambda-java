@@ -82,7 +82,7 @@ public class MetricWrapper implements Closeable {
                     context.getLogger().log("Metric sending error");
                 }));
         session = metricSender.createSession();
-        
+
         this.defaultDimensions = getDefaultDimensions(context).entrySet().stream().map(
                 e -> getDimensionAsProtoBuf(e.getKey(), e.getValue())
         ).collect(Collectors.toList());
@@ -113,12 +113,9 @@ public class MetricWrapper implements Closeable {
             defaultDimensions.put("lambda_arn", functionArn);
             defaultDimensions.put("aws_region", splitted[3]);
             defaultDimensions.put("aws_account_id", splitted[4]);
-            if ("function".equals(splitted[5])) {
-                defaultDimensions.put("aws_function_name", splitted[6]);
-                if (splitted.length == 8) {
-                    defaultDimensions.put("aws_function_qualifier", splitted[7]);
-                }
-            } else if ("event-source-mappings".equals(splitted[5])) {
+            if ("function".equals(splitted[5]) && splitted.length == 8) {
+                defaultDimensions.put("aws_function_qualifier", splitted[7]);
+            } else if ("event-source-mappings".equals(splitted[5]) && splitted.length > 6) {
                 defaultDimensions.put("event_source_mappings", splitted[6]);
             }
         }
@@ -156,7 +153,7 @@ public class MetricWrapper implements Closeable {
     @Override
     public void close() throws IOException {
         sendMetric(METRIC_NAME_DURATION, SignalFxProtocolBuffers.MetricType.GAUGE,
-                System.nanoTime() - startTime);
+                (System.nanoTime() - startTime) * 1000);
         session.close();
     }
 }
