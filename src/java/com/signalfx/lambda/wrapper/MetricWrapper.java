@@ -36,7 +36,6 @@ public class MetricWrapper implements Closeable {
     protected static final String METRIC_NAME_COLD_STARTS = METRIC_NAME_PREFIX + "coldStarts";
     protected static final String METRIC_NAME_ERRORS = METRIC_NAME_PREFIX + "errors";
     protected static final String METRIC_NAME_DURATION = METRIC_NAME_PREFIX + "duration";
-    protected static final String METRIC_NAME_COMPLETED = METRIC_NAME_PREFIX + "completed";
 
     private final AggregateMetricSender.Session session;
 
@@ -47,6 +46,11 @@ public class MetricWrapper implements Closeable {
     private final long startTime;
 
     public MetricWrapper(Context context) {
+        this(context, null);
+    }
+
+    public MetricWrapper(Context context,
+                         List<SignalFxProtocolBuffers.Dimension> dimensions) {
         String authToken = System.getenv(AUTH_TOKEN);
         int timeoutMs = -1;
         try {
@@ -79,9 +83,13 @@ public class MetricWrapper implements Closeable {
                 }));
         session = metricSender.createSession();
 
-        defaultDimensions = getDefaultDimensions(context).entrySet().stream().map(
+        this.defaultDimensions = getDefaultDimensions(context).entrySet().stream().map(
                 e -> getDimensionAsProtoBuf(e.getKey(), e.getValue())
         ).collect(Collectors.toList());
+
+        if (dimensions != null) {
+            this.defaultDimensions.addAll(dimensions);
+        }
 
         MetricSender.setWrapper(this);
 
@@ -98,22 +106,16 @@ public class MetricWrapper implements Closeable {
         String functionArn = context.getInvokedFunctionArn();
         String[] splitted = functionArn.split(":");
         if ("lambda".equals(splitted[2])) {
+            defaultDimensions.put("aws_function_name", context.getFunctionName());
+            defaultDimensions.put("aws_function_version", context.getFunctionVersion());
             // only add if it's lambda arn
             // formatting is per specification at http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-lambda
             defaultDimensions.put("lambda_arn", functionArn);
             defaultDimensions.put("aws_region", splitted[3]);
             defaultDimensions.put("aws_account_id", splitted[4]);
-            if ("function".equals(splitted[5])) {
-                defaultDimensions.put("aws_function_name", splitted[6]);
-                String functionVersion;
-                if (splitted.length == 8) {
-                    functionVersion = splitted[7];
-                } else {
-                    functionVersion = context.getFunctionVersion();
-                }
-
-                defaultDimensions.put("aws_function_version", functionVersion);
-            } else if ("event-source-mappings".equals(splitted[5])) {
+            if ("function".equals(splitted[5]) && splitted.length == 8) {
+                defaultDimensions.put("aws_function_qualifier", splitted[7]);
+            } else if ("event-source-mappings".equals(splitted[5]) && splitted.length > 6) {
                 defaultDimensions.put("event_source_mappings", splitted[6]);
             }
         }
@@ -150,9 +152,8 @@ public class MetricWrapper implements Closeable {
 
     @Override
     public void close() throws IOException {
-        sendMetric(METRIC_NAME_COMPLETED, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
         sendMetric(METRIC_NAME_DURATION, SignalFxProtocolBuffers.MetricType.GAUGE,
-                System.nanoTime() - startTime);
+                (System.nanoTime() - startTime) * 1000);
         session.close();
     }
 }
