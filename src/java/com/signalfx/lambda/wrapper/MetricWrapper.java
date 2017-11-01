@@ -153,7 +153,7 @@ public class MetricWrapper implements Closeable {
     @Override
     public void close() throws IOException {
         sendMetric(METRIC_NAME_DURATION, SignalFxProtocolBuffers.MetricType.GAUGE,
-                (System.nanoTime() - startTime) * 1000);
+                (System.nanoTime() - startTime) / 1000);
         session.close();
     }
 }
