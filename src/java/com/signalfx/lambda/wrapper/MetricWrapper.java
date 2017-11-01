@@ -94,10 +94,10 @@ public class MetricWrapper implements Closeable {
         MetricSender.setWrapper(this);
 
         startTime = System.nanoTime();
-        sendMetric(METRIC_NAME_INVOCATIONS, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+        sendMetricCounter(METRIC_NAME_INVOCATIONS, SignalFxProtocolBuffers.MetricType.COUNTER);
         if (isColdStart) {
             isColdStart = false;
-            sendMetric(METRIC_NAME_COLD_STARTS, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+            sendMetricCounter(METRIC_NAME_COLD_STARTS, SignalFxProtocolBuffers.MetricType.COUNTER);
         }
     }
 
@@ -130,15 +130,19 @@ public class MetricWrapper implements Closeable {
     }
 
     private void sendMetric(String metricName, SignalFxProtocolBuffers.MetricType metricType,
-                            long value) {
+                            SignalFxProtocolBuffers.Datum datum) {
         SignalFxProtocolBuffers.DataPoint.Builder builder =
                 SignalFxProtocolBuffers.DataPoint.newBuilder()
                         .setMetric(metricName)
                         .setMetricType(metricType)
-                        .setValue(
-                                SignalFxProtocolBuffers.Datum.newBuilder()
-                                        .setIntValue(value));
+                        .setValue(datum);
         MetricSender.sendMetric(builder);
+    }
+
+    private void sendMetricCounter(String metricName,
+                                   SignalFxProtocolBuffers.MetricType metricType) {
+        sendMetric(metricName, metricType,
+                SignalFxProtocolBuffers.Datum.newBuilder().setIntValue(1).build());
     }
 
     protected void sendMetric(SignalFxProtocolBuffers.DataPoint.Builder builder) {
@@ -147,13 +151,16 @@ public class MetricWrapper implements Closeable {
     }
 
     public void error() {
-        sendMetric(METRIC_NAME_ERRORS, SignalFxProtocolBuffers.MetricType.COUNTER, 1);
+        sendMetricCounter(METRIC_NAME_ERRORS, SignalFxProtocolBuffers.MetricType.COUNTER);
     }
 
     @Override
     public void close() throws IOException {
         sendMetric(METRIC_NAME_DURATION, SignalFxProtocolBuffers.MetricType.GAUGE,
-                (System.nanoTime() - startTime) / 1000);
+                SignalFxProtocolBuffers.Datum.newBuilder()
+                    .setDoubleValue((System.nanoTime() - startTime) / 1000000f)
+                    .build()
+        );
         session.close();
     }
 }
