@@ -148,6 +148,7 @@ public class MetricWrapper implements Closeable {
         if (!Strings.isNullOrEmpty(wrapperVersion)) {
             defaultDimensions.put("function_wrapper_version", wrapperVersion);
         }
+        defaultDimensions.put("metric_source", "lambda_wrapper");
         return defaultDimensions;
     }
 
