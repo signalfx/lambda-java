@@ -112,7 +112,7 @@ public class MetricWrapper implements Closeable {
             InputStream resourceAsStream = MetricWrapper.class
                     .getResourceAsStream("/signalfx_wrapper.properties");
             if (resourceAsStream == null) {
-                // should not happen, resource could not found
+                // should not happen, resource could not be found
                 return null;
             }
             properties.load(resourceAsStream);
