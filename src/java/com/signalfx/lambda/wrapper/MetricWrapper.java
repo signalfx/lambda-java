@@ -5,14 +5,19 @@ package com.signalfx.lambda.wrapper;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
+
 import com.amazonaws.services.lambda.runtime.Context;
+import com.google.common.base.Strings;
 import com.signalfx.endpoint.SignalFxEndpoint;
 import com.signalfx.endpoint.SignalFxReceiverEndpoint;
 import com.signalfx.metrics.auth.StaticAuthToken;
@@ -31,9 +36,9 @@ public class MetricWrapper implements Closeable {
     private static final String TIMEOUT_MS = "SIGNALFX_SEND_TIMEOUT";
 
     // metric names
-    protected static final String METRIC_NAME_PREFIX = "aws.lambda.";
+    protected static final String METRIC_NAME_PREFIX = "function.";
     protected static final String METRIC_NAME_INVOCATIONS = METRIC_NAME_PREFIX + "invocations";
-    protected static final String METRIC_NAME_COLD_STARTS = METRIC_NAME_PREFIX + "coldStarts";
+    protected static final String METRIC_NAME_COLD_STARTS = METRIC_NAME_PREFIX + "cold_starts";
     protected static final String METRIC_NAME_ERRORS = METRIC_NAME_PREFIX + "errors";
     protected static final String METRIC_NAME_DURATION = METRIC_NAME_PREFIX + "duration";
 
@@ -101,7 +106,23 @@ public class MetricWrapper implements Closeable {
         }
     }
 
-    public static Map<String, String> getDefaultDimensions(Context context) {
+    private static String getWrapperVersionString() {
+        try {
+            Properties properties = new Properties();
+            InputStream resourceAsStream = MetricWrapper.class
+                    .getResourceAsStream("/signalfx_wrapper.properties");
+            if (resourceAsStream == null) {
+                // should not happen, resource could not be found
+                return null;
+            }
+            properties.load(resourceAsStream);
+            return properties.getProperty("artifactId") + "-" + properties.getProperty("version");
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private static Map<String, String> getDefaultDimensions(Context context) {
         Map<String, String> defaultDimensions = new HashMap<>();
         String functionArn = context.getInvokedFunctionArn();
         String[] splitted = functionArn.split(":");
@@ -119,6 +140,15 @@ public class MetricWrapper implements Closeable {
                 defaultDimensions.put("event_source_mappings", splitted[6]);
             }
         }
+        String runTimeEnv = System.getenv("AWS_EXECUTION_ENV");
+        if (!Strings.isNullOrEmpty(runTimeEnv)) {
+            defaultDimensions.put("aws_execution_env", runTimeEnv);
+        }
+        String wrapperVersion = getWrapperVersionString();
+        if (!Strings.isNullOrEmpty(wrapperVersion)) {
+            defaultDimensions.put("function_wrapper_version", wrapperVersion);
+        }
+        defaultDimensions.put("metric_source", "lambda_wrapper");
         return defaultDimensions;
     }
 
