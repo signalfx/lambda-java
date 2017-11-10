@@ -51,6 +51,22 @@ public class WrapperTest {
     }
 
     @Test
+    public void testRequestWrapperWithNoVersionInContext() throws Exception {
+        environmentVariables.set(SignalFxBaseWrapper.SIGNALFX_LAMBDA_HANDLER, "com.signalfx.lambda.wrapper.test.TestCustomHandler::handler");
+
+        SignalFxRequestWrapper streamWrapper = new SignalFxRequestWrapper();
+        Object response = streamWrapper
+                .handleRequest(TestCustomHandler.CORRECT_INPUT, new LambdaRunnerContext() {
+
+                    @Override
+                    public String getInvokedFunctionArn() {
+                        return "arn:aws:lambda:us-east-2:someAccountId:function:LambdaRunnerTest";
+                    }
+                });
+        assertEquals(TestCustomHandler.CORRECT_OUTPUT, response);
+    }
+
+    @Test
     public void testRequestWrapperException() throws Exception {
         environmentVariables.set(SignalFxBaseWrapper.SIGNALFX_LAMBDA_HANDLER, "com.signalfx.lambda.wrapper.test.TestCustomHandler::handlerException");
 

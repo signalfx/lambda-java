@@ -8,15 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
-
 import com.amazonaws.services.lambda.runtime.Context;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.signalfx.endpoint.SignalFxEndpoint;
 import com.signalfx.endpoint.SignalFxReceiverEndpoint;
@@ -41,6 +39,7 @@ public class MetricWrapper implements Closeable {
     protected static final String METRIC_NAME_COLD_STARTS = METRIC_NAME_PREFIX + "cold_starts";
     protected static final String METRIC_NAME_ERRORS = METRIC_NAME_PREFIX + "errors";
     protected static final String METRIC_NAME_DURATION = METRIC_NAME_PREFIX + "duration";
+    public static final Joiner JOINER = Joiner.on(":");
 
     private final AggregateMetricSender.Session session;
 
@@ -127,17 +126,26 @@ public class MetricWrapper implements Closeable {
         String functionArn = context.getInvokedFunctionArn();
         String[] splitted = functionArn.split(":");
         if ("lambda".equals(splitted[2])) {
-            defaultDimensions.put("aws_function_name", context.getFunctionName());
-            defaultDimensions.put("aws_function_version", context.getFunctionVersion());
             // only add if it's lambda arn
             // formatting is per specification at http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-lambda
-            defaultDimensions.put("lambda_arn", functionArn);
+            defaultDimensions.put("aws_function_name", context.getFunctionName());
+            defaultDimensions.put("aws_function_version", context.getFunctionVersion());
             defaultDimensions.put("aws_region", splitted[3]);
             defaultDimensions.put("aws_account_id", splitted[4]);
-            if ("function".equals(splitted[5]) && splitted.length == 8) {
-                defaultDimensions.put("aws_function_qualifier", splitted[7]);
+
+            if ("function".equals(splitted[5])) {
+                if (splitted.length == 8) {
+                    defaultDimensions.put("aws_function_qualifier", splitted[7]);
+                }
+
+                String[] updatedArn = new String[8];
+                System.arraycopy(splitted, 0, updatedArn, 0, splitted.length);
+                updatedArn[7] = context.getFunctionVersion();
+
+                defaultDimensions.put("lambda_arn", JOINER.join(updatedArn));
             } else if ("event-source-mappings".equals(splitted[5]) && splitted.length > 6) {
                 defaultDimensions.put("event_source_mappings", splitted[6]);
+                defaultDimensions.put("lambda_arn", functionArn);
             }
         }
         String runTimeEnv = System.getenv("AWS_EXECUTION_ENV");
