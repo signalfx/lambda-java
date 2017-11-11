@@ -56,7 +56,7 @@ public class MetricWrapper implements Closeable {
     public MetricWrapper(Context context,
                          List<SignalFxProtocolBuffers.Dimension> dimensions) {
         String authToken = System.getenv(AUTH_TOKEN);
-        int timeoutMs = -1;
+        int timeoutMs = 300; // default timeout to 300ms
         try {
             timeoutMs = Integer.valueOf(System.getenv(TIMEOUT_MS));
         } catch (NumberFormatException e) {
@@ -64,7 +64,7 @@ public class MetricWrapper implements Closeable {
         }
 
         // Create endpoint for ingest URL
-        SignalFxReceiverEndpoint signalFxEndpoint = new SignalFxEndpoint();
+        SignalFxLambaEndpoint signalFxEndpoint = new SignalFxLambaEndpoint();
 
         // Create datapoint dataPointReceiverFactory for endpoint
         HttpDataPointProtobufReceiverFactory dataPointReceiverFactory = new HttpDataPointProtobufReceiverFactory(signalFxEndpoint)
