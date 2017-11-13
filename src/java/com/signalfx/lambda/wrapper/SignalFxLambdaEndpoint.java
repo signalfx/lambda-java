@@ -14,7 +14,7 @@ import com.signalfx.endpoint.SignalFxReceiverEndpoint;
  *
  * @author park
  */
-public class SignalFxLambaEndpoint implements SignalFxReceiverEndpoint {
+public class SignalFxLambdaEndpoint implements SignalFxReceiverEndpoint {
     public static final String DEFAULT_SCHEME = "https";
     public static final String DEFAULT_HOSTNAME = "pops.ingest.signalfx.com";
     public static final int DEFAULT_PORT = 443;
@@ -36,17 +36,17 @@ public class SignalFxLambaEndpoint implements SignalFxReceiverEndpoint {
      */
     private final int port;
 
-    public SignalFxLambaEndpoint(String hostname, int port) {
+    public SignalFxLambdaEndpoint(String hostname, int port) {
         this(getDefaultScheme(), hostname, port);
     }
 
-    public SignalFxLambaEndpoint(String scheme, String hostname, int port) {
+    public SignalFxLambdaEndpoint(String scheme, String hostname, int port) {
         this.scheme = scheme;
         this.hostname = hostname;
         this.port = port;
     }
 
-    public SignalFxLambaEndpoint() {
+    public SignalFxLambdaEndpoint() {
         this(getDefaultScheme(), getDefaultHostname(), getDefaultPort());
     }
 

@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.signalfx.endpoint.SignalFxEndpoint;
-import com.signalfx.endpoint.SignalFxReceiverEndpoint;
 import com.signalfx.metrics.auth.StaticAuthToken;
 import com.signalfx.metrics.connection.HttpDataPointProtobufReceiverFactory;
 import com.signalfx.metrics.connection.HttpEventProtobufReceiverFactory;
@@ -64,7 +62,7 @@ public class MetricWrapper implements Closeable {
         }
 
         // Create endpoint for ingest URL
-        SignalFxLambaEndpoint signalFxEndpoint = new SignalFxLambaEndpoint();
+        SignalFxLambdaEndpoint signalFxEndpoint = new SignalFxLambdaEndpoint();
 
         // Create datapoint dataPointReceiverFactory for endpoint
         HttpDataPointProtobufReceiverFactory dataPointReceiverFactory = new HttpDataPointProtobufReceiverFactory(signalFxEndpoint)
