@@ -16,7 +16,7 @@ import com.signalfx.endpoint.SignalFxReceiverEndpoint;
  */
 public class SignalFxLambdaEndpoint implements SignalFxReceiverEndpoint {
     public static final String DEFAULT_SCHEME = "https";
-    public static final String DEFAULT_HOSTNAME = "pops.ingest.signalfx.com";
+    public static final String DEFAULT_HOSTNAME = "pops.signalfx.com";
     public static final int DEFAULT_PORT = 443;
     private static final Logger log = LoggerFactory
             .getLogger(com.signalfx.endpoint.SignalFxEndpoint.class);
