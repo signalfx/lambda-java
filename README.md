@@ -10,18 +10,12 @@ SignalFx Java Lambda Wrapper.
 
 The SignalFx Java Lambda Wrapper is a wrapper around an AWS Lambda Java function handler, used to instrument execution of the function and send metrics to SignalFx.
 
-### Download jar file
-Use the jar file from https://cdn.signalfx.com/signalfx-lambda-0.0.4.jar and install it to your local maven repository with following parameters:
-- groupId: `com.signalfx.public`
-- artifactId: `signalfx-lambda`
-- version: `0.0.4`
-
 ### Install via maven dependency
 ```xml
 <dependency>
   <groupId>com.signalfx.public</groupId>
   <artifactId>signalfx-lambda</artifactId>
-  <version>0.0.4</version>
+  <version>0.0.5</version>
 </dependency>
 ```
 
@@ -90,7 +84,7 @@ The Lambda wrapper adds the following dimensions to all data points sent to Sign
 | aws_function_qualifier  | AWS Function Version Qualifier (version or version alias if it is not an event source mapping Lambda invocation) |
 | event_source_mappings  | AWS Function Name (if it is an event source mapping Lambda invocation) |
 | aws_execution_env  | AWS execution environment (e.g. AWS_Lambda_java8) |
-| function_wrapper_version  | SignalFx function wrapper qualifier (e.g. signalfx-lambda-0.0.4) |
+| function_wrapper_version  | SignalFx function wrapper qualifier (e.g. signalfx-lambda-0.0.5) |
 | metric_source | The literal value of 'lambda_wrapper' |
 
 ### Sending a metric from the Lambda function
