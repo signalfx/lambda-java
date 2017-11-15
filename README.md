@@ -15,7 +15,7 @@ The SignalFx Java Lambda Wrapper is a wrapper around an AWS Lambda Java function
 <dependency>
   <groupId>com.signalfx.public</groupId>
   <artifactId>signalfx-lambda</artifactId>
-  <version>0.0.5</version>
+  <version>0.0.6</version>
 </dependency>
 ```
 
