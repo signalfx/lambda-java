@@ -53,7 +53,13 @@ public class MetricWrapper implements Closeable {
 
     public MetricWrapper(Context context,
                          List<SignalFxProtocolBuffers.Dimension> dimensions) {
-        String authToken = System.getenv(AUTH_TOKEN);
+        this(context, dimensions, System.getenv(AUTH_TOKEN));
+    }
+
+    public MetricWrapper(Context context,
+                         List<SignalFxProtocolBuffers.Dimension> dimensions,
+                         String authToken
+                         ) {
         int timeoutMs = 300; // default timeout to 300ms
         try {
             timeoutMs = Integer.valueOf(System.getenv(TIMEOUT_MS));
