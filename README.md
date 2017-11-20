@@ -55,7 +55,7 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
 ```
 3) Optional parameters available:
 ```
- SIGNALFX_API_HOSTNAME=[ingest.signalfx.com]
+ SIGNALFX_API_HOSTNAME=[pops.signalfx.com]
  SIGNALFX_API_PORT=[443]
  SIGNALFX_API_SCHEME=[https]
  SIGNALFX_SEND_TIMEOUT=milliseconds for signalfx client timeout [2000]
