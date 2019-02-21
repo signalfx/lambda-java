@@ -28,6 +28,14 @@ Configure Handler for the function in AWS to be:
 * `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal Input/Output request
 * `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal Stream request
 
+#### Configuring the ingest endpoint
+
+By default, this function wrapper will send to the `us0` realm. If you are
+not in this realm you will need to set the `SIGNALFX_API_HOSTNAME` environment
+variable to the correct realm ingest endpoint (https://ingest.{REALM}.signalfx.com).
+To determine what realm you are in, check your profile page in the SignalFx
+web application (click the avatar in the upper right and click My Profile).
+
 ### Using your own Handler
 Manually wrap the code inside the handler as followed:
 ```java
