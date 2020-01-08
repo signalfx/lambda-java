@@ -68,16 +68,16 @@ To locate your realm:
 Set the Lambda environment variables as follows:
 
 1) Set authentication token:
-```
- SIGNALFX_AUTH_TOKEN=signalfx token
-```
+    ```
+     SIGNALFX_AUTH_TOKEN=signalfx token
+    ```
 2) Optional parameters available:
-```
- SIGNALFX_API_HOSTNAME=[pops.signalfx.com]
- SIGNALFX_API_PORT=[443]
- SIGNALFX_API_SCHEME=[https]
- SIGNALFX_SEND_TIMEOUT=milliseconds for signalfx client timeout [2000]
-```
+    ```
+     SIGNALFX_API_HOSTNAME=[pops.signalfx.com]
+     SIGNALFX_API_PORT=[443]
+     SIGNALFX_API_SCHEME=[https]
+     SIGNALFX_SEND_TIMEOUT=milliseconds for signalfx client timeout [2000]
+    ```
 
 When setting SIGNALFX_API_HOSTNAME, remember to account for your realm, as explained in Step 4.
 
@@ -152,10 +152,10 @@ Test example is available at `com.signalfx.lambda.example.CustomHandler::handler
 
 ### Testing locally
 1) Set test input event and lambda function handler:
-```
-LAMBDA_INPUT_EVENT={"abc": "def"}
-SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
-```
+    ```
+    LAMBDA_INPUT_EVENT={"abc": "def"}
+    SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
+    ```
 2) Run `mvn compile exec:java`.
 
 ### Testing from the AWS Console
