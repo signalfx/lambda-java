@@ -21,26 +21,27 @@ The SignalFx Java Lambda Wrapper wraps around an AWS Lambda Java function handle
 
 ## Step 2: Package and upload 
 
-1. Package the jar file, and then upload to AWS. To upload, please review the [instructions from AWS](http://docs.aws.amazon.com/lambda/latest/dg/java-create-jar-pkg-maven-no-ide.html).
+1. Package the .jar file, and then upload to AWS. 
+  * To learn how to upload, please see the [instructions from AWS](http://docs.aws.amazon.com/lambda/latest/dg/java-create-jar-pkg-maven-no-ide.html).
 
 ## Step 3: Wrap the function
 
 There are two ways to wrap the function. You can use the SignalFx handler or manually wrap the function. 
-
-Review the appropriate option. 
 
 ### (Recommended) Option 1: Use the SignalFx handler
 
 1. Configure the SignalFx handler for the following functions in AWS: 
 
   * Use `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal input/output request. 
-    * Review the [example](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomRequestHandler.java). 
+    * Please review the [example here](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomRequestHandler.java). 
   * Use `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal stream request. 
-    * Review the [example](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomStreamHandler.java).
+    * Please review the [example here](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomStreamHandler.java).
 
-For additional available function signatures, see [additional examples](https://github.com/signalfx/lambda-java/tree/master/src/java/com/signalfx/lambda/example). 
+For additional custom function signatures, see [additional examples](https://github.com/signalfx/lambda-java/tree/master/src/java/com/signalfx/lambda/example). 
 
-2. Use the SIGNALFX_LAMBDA_HANDLER environment variable to set the handler function. The format of the handler needs to be `package.ClassName::methodName`, such as `com.signalfx.lambda.example.CustomHandler::handler`. Review the following example. 
+2. Use the SIGNALFX_LAMBDA_HANDLER environment variable to set the handler function. The format of the handler needs to be `package.ClassName::methodName`, such as `com.signalfx.lambda.example.CustomHandler::handler`. 
+
+Review the following example. 
 ```
 SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
 ```
@@ -60,7 +61,7 @@ try {
     wrapper.close();
 }
 ```
-2. Review the [custom handler](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomHandler.java).
+2. For additional custom function signatures, review the [custom handler example](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomHandler.java).
 
 ## Step 4: Locate ingest endpoint
 
@@ -111,7 +112,7 @@ builder.addDimensionsBuilder().setKey("applicationName").setValue("CoolApp").bui
 MetricSender.sendMetric(builder);
 ```
 
-### (Optional) Step 7: Reduce the size of deployment packages with AWS Lambda Layers
+## (Optional) Step 7: Reduce the size of deployment packages with AWS Lambda Layers
 
 For advanced users who want to reduce the size of deployment packages, please visit the AWS documentation site and see [AWS Lambda Layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html).
 
@@ -161,7 +162,7 @@ The Lambda wrapper adds the following dimensions to all data points sent to Sign
 1. A test example is available at `com.signalfx.lambda.example.CustomHandler::handler`. If necessary, make desired changes. 
 
 ### Test locally
-1. Set test input event and Lambda function handler.
+1. Set test input event and Lambda function handler. Review the following example. 
     ```
     LAMBDA_INPUT_EVENT={"abc": "def"}
     SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
