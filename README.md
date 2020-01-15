@@ -30,7 +30,7 @@ There are two ways to wrap the function. You can use the SignalFx handler or man
 
 ### (Recommended) Option 1: Use the SignalFx handler
 
-1. Configure the SignalFx handler for the following functions in AWS: 
+1. Configure the AWS function handler to have one of the following values:
 
   * Use `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal input/output request. 
     * Please review the [example here](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomRequestHandler.java). 
@@ -48,7 +48,7 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
 
 ### Option 2: Manually wrap the function
 
-1. Manually wrap the code inside the handler. Review the following example.
+1. Review the following example of manually wrapping a function.
 
 ```java
 // in your handler
