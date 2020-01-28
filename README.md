@@ -133,4 +133,4 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
 
 ## License
 
-Apache Software License v2. Copyright © 2014-2020 SignalFx
+Apache Software License v2. Copyright © 2014-2020 Splunk
