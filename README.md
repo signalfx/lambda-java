@@ -4,7 +4,7 @@ SignalFx Java Lambda Wrapper.
 
 ## Supported Languages
 
-* Java 7+
+* Java 8+
 
 ## Usage
 
@@ -15,7 +15,7 @@ The SignalFx Java Lambda Wrapper is a wrapper around an AWS Lambda Java function
 <dependency>
   <groupId>com.signalfx.public</groupId>
   <artifactId>signalfx-lambda</artifactId>
-  <version>0.0.8</version>
+  <version>0.1</version>
 </dependency>
 ```
 
@@ -119,7 +119,8 @@ Test example is available at `com.signalfx.lambda.example.CustomHandler::handler
 ### Testing locally.
 1) Set test input event and lambda function handler:
 ```
-LAMBDA_INPUT_EVENT={"abc": "def"}
+LAMBDA_INPUT_EVENT='{"abc": "def"}'
+LAMBDA_RUNNER_HANDLER=com.signalfx.lambda.wrapper.SignalFxRequestWrapper
 SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
 ```
 2) Run `mvn compile exec:java`.
@@ -132,4 +133,4 @@ SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
 
 ## License
 
-Apache Software License v2. Copyright © 2014-2017 SignalFx
+Apache Software License v2. Copyright © 2014-2020 Splunk
