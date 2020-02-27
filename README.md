@@ -20,7 +20,7 @@ The SignalFx Java Lambda Wrapper wraps around an AWS Lambda Java function handle
 </dependency>
 ```
 
-### Step 2: Choose one of the following wrapping options.
+### Step 2: Wrap the function 
 
 There are two ways to wrap the function. You can use the SignalFx handler or manually wrap the function. 
 
@@ -28,21 +28,21 @@ There are two ways to wrap the function. You can use the SignalFx handler or man
 
 1. Configure the AWS function handler to have one of the following values:
     * Use `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal input/output request. 
-        * Please review the [example here](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomRequestHandler.java). 
+        * To review an example, please see [CustomRequestHandler.java](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomRequestHandler.java). 
     * Use `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal stream request. 
-        * Please review the [example here](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomStreamHandler.java).
-    For additional custom function signatures, see [additional examples](https://github.com/signalfx/lambda-java/tree/master/src/java/com/signalfx/lambda/example). 
+        * To review an example, please see [CustomRequestHandler.java](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomStreamHandler.java).
+    To review additional custom function signatures, please see [lambda-java examples](https://github.com/signalfx/lambda-java/tree/master/src/java/com/signalfx/lambda/example). 
 2. Use the `SIGNALFX_LAMBDA_HANDLER` environment variable to set the handler function. 
     The format of the handler needs to be `package.ClassName::methodName`, such as `com.signalfx.lambda.example.CustomHandler::handler`. 
 
-    Review the following example. 
+    Review the following example: 
     ```
     SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
     ```
 
 #### Option 2: Manually wrap the function
 
-1. Review the following example of manually wrapping a function.
+1. To learn how to manually wrap a function, review the following example:
 
     ```java
     // in your handler
@@ -55,9 +55,9 @@ There are two ways to wrap the function. You can use the SignalFx handler or man
         wrapper.close();
     }
     ```
-    Review the [example](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomHandler.java).
+    For more examples, please see [CustomHandler.java](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomHandler.java).
 
-2. Configure handler for the function in AWS to point to the main method in your code. The handler needs to be in the format `package.ClassName::methodName`.
+2. Configure the handler for the function in AWS to point to the main method in your code. The handler needs to be in the `package.ClassName::methodName` format.
 
 ### Step 3: Package and upload 
 
@@ -81,7 +81,7 @@ To set your realm, you will need to use a subdomain, such as ingest.us1.signalfx
 
 Set the Lambda environment variables as follows:
 
-1) Set authentication token:
+1. Set authentication token:
     ```
      SIGNALFX_AUTH_TOKEN=signalfx token
     ```
