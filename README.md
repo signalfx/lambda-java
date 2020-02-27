@@ -6,9 +6,12 @@
 
 ## Overview
 
-The SignalFx Java Lambda Wrapper is a wrapper around an AWS Lambda Java function handler, used to instrument execution of the function and send metrics to SignalFx.
+You can use this document to add a SignalFx wrapper to your AWS Lambda for Java, specifically for Java 8+.
+
+The SignalFx Java Lambda Wrapper wraps around an AWS Lambda Java function handler, which allows metrics to be sent to SignalFx.
 
 ### Step 1: Install via maven dependency
+
 ```xml
 <dependency>
   <groupId>com.signalfx.public</groupId>
@@ -17,46 +20,54 @@ The SignalFx Java Lambda Wrapper is a wrapper around an AWS Lambda Java function
 </dependency>
 ```
 
-### Step 2: Package
-Package jar file and upload to AWS per instructions [here](http://docs.aws.amazon.com/lambda/latest/dg/java-create-jar-pkg-maven-no-ide.html).
+### Step 2: Choose one of the following wrapping options.
 
-### Step 3: Choose one of the following wrapping options.
-#### Option 1: Using SignalFx Handler (recommended)
-##### Step 1: Configure Handler for the function in AWS
+There are two ways to wrap the function. You can use the SignalFx handler or manually wrap the function. 
 
-Configure Handler for the function in AWS to be:
-* `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal Input/Output request. Review the [example](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomRequestHandler.java). 
-* `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal Stream request. Review the [example](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomStreamHandler.java).
+#### (Recommended) Option 1: Use the SignalFx handler
 
-For available function signatures, check https://github.com/signalfx/lambda-java/tree/master/src/java/com/signalfx/lambda/example 
+1. Configure the AWS function handler to have one of the following values:
+    * Use `com.signalfx.lambda.wrapper.SignalFxRequestWrapper::handleRequest` for normal input/output request. 
+        * Please review the [example here](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomRequestHandler.java). 
+    * Use `com.signalfx.lambda.wrapper.SignalFxRequestStreamWrapper::handleRequest` for normal stream request. 
+        * Please review the [example here](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomStreamHandler.java).
+    For additional custom function signatures, see [additional examples](https://github.com/signalfx/lambda-java/tree/master/src/java/com/signalfx/lambda/example). 
+2. Use the `SIGNALFX_LAMBDA_HANDLER` environment variable to set the handler function. 
+    The format of the handler needs to be `package.ClassName::methodName`, such as `com.signalfx.lambda.example.CustomHandler::handler`. 
 
-##### Step 2: Set the handler function using SIGNALFX_LAMBDA_HANDLER environment variable
-Set the handler function using SIGNALFX_LAMBDA_HANDLER environment variable. The format of the handler needs to be `package.ClassName::methodName`, for example `com.signalfx.lambda.example.CustomHandler::handler`.
-```
-SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
-```
+    Review the following example. 
+    ```
+    SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
+    ```
 
 #### Option 2: Manually wrap the function
-##### Step 1: Manually wrap the code inside the handler as followed:
 
-```java
-// in your handler
-MetricWrapper wrapper = new MetricWrapper(context)
-try {
-    // your code
-} catch (Exception e) {
-    wrapper.error();
-} finally {
-    wrapper.close();
-}
-```
-Review the [example](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomHandler.java).
+1. Review the following example of manually wrapping a function.
 
-Configure Handler for the function in AWS to point to your function.
+    ```java
+    // in your handler
+    MetricWrapper wrapper = new MetricWrapper(context)
+    try {
+        // your code
+    } catch (Exception e) {
+        wrapper.error();
+    } finally {
+        wrapper.close();
+    }
+    ```
+    Review the [example](https://github.com/signalfx/lambda-java/blob/master/src/java/com/signalfx/lambda/example/CustomHandler.java).
+
+2. Configure handler for the function in AWS to point to the main method in your code. The handler needs to be in the format `package.ClassName::methodName`.
+
+### Step 3: Package and upload 
+
+1. Package the .jar file, and then upload to AWS. 
+  * To learn how to upload, please see the [instructions from AWS](http://docs.aws.amazon.com/lambda/latest/dg/java-create-jar-pkg-maven-no-ide.html).
 
 ### Step 4: Locate ingest endpoint
 
-By default, this function wrapper will send data to the us0 realm. As a result, if you are not in us0 realm and you want to use the ingest endpoint directly, then you must explicitly set your realm. To set your realm, use a subdomain, such as ingest.us1.signalfx.com or ingest.eu0.signalfx.com.
+By default, this function wrapper will send data to the us0 realm. As a result, if you are not in us0 realm and you want to use the ingest endpoint directly, then you must explicitly set your realm.
+To set your realm, use a subdomain, such as ingest.us1.signalfx.com or ingest.eu0.signalfx.com.
 
 To locate your realm:
 
@@ -64,7 +75,9 @@ To locate your realm:
 2. Click **My Profile**.
 3. Next to **Organizations**, review the listed realm.
 
-### Step 5: Set environment variables
+To set your realm, you will need to use a subdomain, such as ingest.us1.signalfx.com or ingest.eu0.signalfx.com. This action will be explained in Step 5.  
+
+### Step 5: Set Lambda environment variables
 
 Set the Lambda environment variables as follows:
 
@@ -72,17 +85,19 @@ Set the Lambda environment variables as follows:
     ```
      SIGNALFX_AUTH_TOKEN=signalfx token
     ```
-2) Optional parameters available:
+2. (Optional) Set additional parameters:  
     ```
      SIGNALFX_API_HOSTNAME=[pops.signalfx.com]
      SIGNALFX_API_PORT=[443]
      SIGNALFX_API_SCHEME=[https]
      SIGNALFX_SEND_TIMEOUT=milliseconds for signalfx client timeout [2000]
     ```
+If your SignalFx account is not in the us0 realm, `SIGNALFX_API_HOSTNAME` should be set to ingest endpoint, which you located in Step 4.
 
-When setting SIGNALFX_API_HOSTNAME, remember to account for your realm, as explained in Step 4.
+### (Optional) Step 6: Send custom metrics from the Lambda function 
 
-### Step 6: Send a custom metric from the Lambda function (optional)
+1. To send custom metrics, review the following example. 
+
 ```java
 // construct data point builder
 SignalFxProtocolBuffers.DataPoint.Builder builder =
@@ -100,25 +115,23 @@ builder.addDimensionsBuilder().setKey("applicationName").setValue("CoolApp").bui
 MetricSender.sendMetric(builder);
 ```
 
-### Step 7: For advanced users - reducing size of the deployment package with AWS Lambda Layers (optional)
-You can reduce size of your deployment package by taking advantage of AWS Lambda Layers feature.
-To learn more about Lambda Layers, please visit the AWS documentation site and see [AWS Lambda Layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html).
+### (Optional) Step 7: Reduce the size of deployment packages with AWS Lambda Layers
 
-On a high level, there are 3 steps to leverage AWS Lambda Layer:
-* Step 1: Locate the layer you wish to use
-* Step 2: Make sure that the dependencies included in the layer are __not__ included in the your Lambda .jar file
-* Step 3: Attach the layer to the Lambda function.
+For advanced users who want to reduce the size of deployment packages, please visit the AWS documentation site and see [AWS Lambda Layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html).
 
-How you achieve Steps 2) and 3) depends on your build and deployment system. In general, one way to __not__  include the wrapper in your .jar file is to mark the depdendency as having `provided` scope.
+At a high level, to reduce the size of deployments with AWS Lambda layers, you must: 
 
-For Step 1), SignalFx provides two ways to use its layer containing SignalFx Lambda wrapper:
-#### Option 1: Hosted layer 
-Use the version of the layer hosted by SignalFx. Hosted layers are available on per-region basis - to identify latest available version in your region, please see [the list of supported versions](https://github.com/signalfx/lambda-layer-versions/blob/master/java/JAVA.md).
-Use the identified ARN in your deployment scripts/AWS console.
-#### Option 2: SAM (Serverless Application Model) template
-Deploy the copy of the SignalFx provided layer to your account. SignalFx provides a SAM template, which, when deployed, will create a layer with the wrapper in your AWS account.
-To follow this Option, log in to your AWS Account. Go to Lambda --> Create a Function and choose the option to create a function from a template. Search for SignalFx, choose Java and deploy. 
-Alternatively, locate the SignalFx layer using Serverless Application Repository service and deploy from there. 
+1. Determine the layer to use. There are two options: 
+    * Option 1: Layer hosted by SignalFx
+        * You can use the version of the layer hosted by SignalFx. Available hosted layers may differ based on region. To review the latest available version based on your region, please see [the list of supported versions](https://github.com/signalfx/lambda-layer-versions/blob/master/java/JAVA.md).
+    * Option 2: SAM (Serverless Application Model) template
+        * You can deploy a copy of the SignalFx-provided layer to your account. SignalFx provides a SAM template that will create a layer with the wrapper in your AWS account. 
+        * To use this option, log into your AWS account. In the Lambda section, create a function, and then choose the option to create a function from a template. Search for SignalFx, choose Java, and then deploy. 
+        * You can also locate the SignalFx layer using the Serverless Application Repository service. 
+2. Verify that dependencies included in the layer are __not__ included in the Lambda .jar file.
+3. Attach the layer to the Lambda function.
+
+Based on your build and deployment system, there are various ways to complete Step 2 and Step 3. In general, to **not** include the wrapper in your .jar file, you can mark the dependency as having `provided` scope.  
 
 ## Additional information
 
@@ -148,25 +161,23 @@ The Lambda wrapper adds the following dimensions to all data points sent to Sign
 | function_wrapper_version  | SignalFx function wrapper qualifier (e.g. signalfx-lambda-0.0.5) |
 | metric_source | The literal value of 'lambda_wrapper' |
 
-## Testing
-Test example is available at `com.signalfx.lambda.example.CustomHandler::handler`. Make appropriate changes if needed.
+### Test
+1. A test example is available at `com.signalfx.lambda.example.CustomHandler::handler`. If necessary, make desired changes. 
 
-### Testing locally
-1) Set test input event and lambda function handler:
-```
-LAMBDA_INPUT_EVENT='{"abc": "def"}'
-LAMBDA_RUNNER_HANDLER=com.signalfx.lambda.wrapper.SignalFxRequestWrapper
-SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
-```
+### Test locally
+1. Set test input event and Lambda function handler. Review the following example. 
+    ```
+    LAMBDA_INPUT_EVENT='{"abc": "def"}'
+    LAMBDA_RUNNER_HANDLER=com.signalfx.lambda.wrapper.SignalFxRequestWrapper
+    SIGNALFX_LAMBDA_HANDLER=com.signalfx.lambda.example.CustomHandler::handler
+    ```
+2. Run `mvn compile exec:java`.
 
-2) Run `mvn compile exec:java`.
+### Test from the AWS Console
+1. Run `mvn clean compile package -Ptest` to package using the test profile, which will include the runner and test handler.
 
-### Testing from the AWS Console
-1) Run `mvn clean compile package -Ptest` to package using the test profile, which will include the runner and test handler.
-
-2) Set the SignalFx Lambda handler environment variable to either
+2. Set the SignalFx Lambda handler environment variable to either
 `com.signalfx.lambda.example.CustomHandler::handler` or `com.signalfx.lambda.example.CustomStreamHandler::handleRequest`.
 
 ## License
-
 Apache Software License v2. Copyright © 2014-2020 Splunk
