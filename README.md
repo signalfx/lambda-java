@@ -87,7 +87,7 @@ Set the Lambda environment variables as follows:
     ```
 2. (Optional) Set additional parameters:  
     ```
-     SIGNALFX_API_HOSTNAME=[pops.signalfx.com]
+     SIGNALFX_API_HOSTNAME=[ingest.us0.signalfx.com]
      SIGNALFX_API_PORT=[443]
      SIGNALFX_API_SCHEME=[https]
      SIGNALFX_SEND_TIMEOUT=milliseconds for signalfx client timeout [2000]
