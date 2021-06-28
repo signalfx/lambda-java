@@ -205,12 +205,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <repositories>
-        <repository>
-            <id>cagatay-gurturk</id>
-            <url>http://maven.cagataygurturk.com/releases</url>
-        </repository>
-    </repositories>
     <build>
         <sourceDirectory>src/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>
