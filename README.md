@@ -1,3 +1,13 @@
+---
+
+<p align="center">
+  <a href="https://github.com/signalfx/lambda-java/actions?query=workflow%3A%22CI+build%22">
+    <img alt="Build Status" src="https://img.shields.io/github/workflow/status/signalfx/lambda-java/CI%20build?style=for-the-badge">
+  </a>
+</p>
+
+---
+
 # SignalFx Java Lambda Wrapper
 
 ## Supported Languages
