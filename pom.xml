@@ -29,36 +29,42 @@
 
     <scm>
         <connection>scm:git:git@github.com:signalfx/lambda-java.git</connection>
-        <developerConnection>scm:git:git@github.com:signalfx/lambda-java.git
-        </developerConnection>
+        <developerConnection>scm:git:git@github.com:signalfx/lambda-java.git</developerConnection>
         <url>git@github.com:signalfx/lambda-java.git</url>
     </scm>
 
     <developers>
         <developer>
-            <id>9park</id>
-            <name>Park Kittipatkul</name>
-            <email>park@signalfx.com</email>
-            <organization>SignalFx</organization>
+            <id>signalfx</id>
+            <name>SignalFx</name>
+            <email>support+java@signalfx.com</email>
+            <organization>SignalFx, Inc</organization>
             <organizationUrl>http://www.signalfx.com</organizationUrl>
         </developer>
     </developers>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
     <profiles>
         <profile>
             <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.3</version>
+                        <version>1.6.8</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
