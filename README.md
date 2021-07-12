@@ -26,7 +26,7 @@ The SignalFx Java Lambda Wrapper wraps around an AWS Lambda Java function handle
 <dependency>
   <groupId>com.signalfx.public</groupId>
   <artifactId>signalfx-lambda</artifactId>
-  <version>0.1</version>
+  <version>0.1.1</version>
 </dependency>
 ```
 
