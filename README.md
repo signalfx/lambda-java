@@ -3,6 +3,8 @@
 > # :warning: Deprecation Notice
 > The SignalFx Java Lambda Wrapper is deprecated. Only critical security fixes and bug fixes are provided.
 >
+> After December 31st, 2022 this repository will be archived (read-only). After December 31st, 2022, no updates will be provided and this repository will be unsupported.
+> 
 > Going forward, Lambda functions should use the Splunk OpenTelemetry Lambda Layer, which offers similar capabilities and fully supports the OpenTelemetry standard. To learn more about the Splunk OTel Lambda Layer, see https://docs.splunk.com/Observability/gdi/get-data-in/serverless/aws/otel-lambda-layer/instrument-lambda-functions.html#nav-Instrument-your-Lambda-function
 
 ---
