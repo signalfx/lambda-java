@@ -1,11 +1,10 @@
 >ℹ️&nbsp;&nbsp;SignalFx was acquired by Splunk in October 2019. See [Splunk SignalFx](https://www.splunk.com/en_us/investor-relations/acquisitions/signalfx.html) for more information.
 
 > # :warning: Deprecation Notice
-> The SignalFx Java Lambda Wrapper is deprecated. Only critical security fixes and bug fixes are provided.
+> **The SignalFx Java Lambda Wrapper has reached end of life and has been permanently archived.**
 >
-> After December 31st, 2022 this repository will be archived (read-only). After December 31st, 2022, no updates will be provided and this repository will be unsupported.
 > 
-> Going forward, Lambda functions should use the Splunk OpenTelemetry Lambda Layer, which offers similar capabilities and fully supports the OpenTelemetry standard. To learn more about the Splunk OTel Lambda Layer, see https://docs.splunk.com/Observability/gdi/get-data-in/serverless/aws/otel-lambda-layer/instrument-lambda-functions.html#nav-Instrument-your-Lambda-function
+> [The Splunk OpenTelemetry Lambda Layer](https://github.com/signalfx/splunk-otel-lambda) is the successor. To learn how to migrate, see  [the supporting documentation](https://docs.splunk.com/Observability/gdi/get-data-in/serverless/aws/otel-lambda-layer/instrument-lambda-functions.html#nav-Instrument-your-Lambda-function)
 
 ---
 
